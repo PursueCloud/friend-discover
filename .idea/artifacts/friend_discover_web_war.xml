@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="friend-discover-web:war">
+    <output-path>$PROJECT_DIR$/friend-discover-web/target</output-path>
+    <root id="archive" name="friend-discover-web.war">
+      <element id="artifact" artifact-name="friend-discover-web:war exploded" />
+    </root>
+  </artifact>
+</component>

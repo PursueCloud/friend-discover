@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.web.friend.mapper.CustomUserMapper">
+	<resultMap type="com.yo.friendis.web.friend.model.CustomUser" id="CustomUserRM">
+	</resultMap>
+
+	<select id="dropTable" >
+		drop table custom_user
+	</select>
+
+	<!-- 创建用户详细信息（属性）表（存储原始用户数据）-->
+	<select id="createTable" >
+		create table custom_user
+		(
+			user_id int(10) unsigned not null auto_increment,
+			display_name varchar(255) comment '显示的名称',
+			icon varchar(512) comment '头像路径',
+			about_me longtext comment '自我介绍',
+			sex int comment '性别',
+			age int(11) comment '年龄',
+			email_hash varchar(255) comment 'email hash值，独一无二',
+			location varchar(255) comment '位置（常驻地）',
+			up_votes int(11) comment '加分（同意）次数',
+			down_votes int(11) comment '扣分（反对）次数',
+			reputation int(11) comment '声望值',
+			views int(11) comment '浏览数',
+			website_url varchar(255) comment '个人首页',
+			create_date datetime comment '账户创建日期',
+			modify_date datetime comment '账户资料修改日期',
+			last_access_date dateTime comment '上一次登录日期',
+			primary key using BTREE(user_id)
+		)  engine=InnoDB default charset=utf8
+	</select>
+
+	<select id="selectAll" resultMap="CustomUserRM">
+		select cu.user_id, cu.display_name, cu.icon, cu.about_me, cu.sex, cu.age, cu.email_hash,
+		cu.location, cu.up_votes, cu.down_votes, cu.reputation, cu.views, cu.website_url,
+		cu.create_date, cu.modify_date, cu.last_access_date from custom_user cu
+	</select>
+
+	<select id="selectByIds" resultMap="CustomUserRM">
+		select cu.user_id, cu.display_name, cu.icon, cu.about_me, cu.sex, cu.age, cu.email_hash,
+		 	   cu.location, cu.up_votes, cu.down_votes, cu.reputation, cu.views, cu.website_url,
+		 	   cu.create_date, cu.modify_date, cu.last_access_date from custom_user cu
+		 	   <where>
+				   cu.user_id IN 
+				   <foreach collection="ids" index="0" item="id" open="(" close=")" separator=",">
+				   #{id}
+				   </foreach>
+			   </where>
+	</select>
+
+	<delete id="deleteAll">
+		delete from custom_user
+	</delete>
+
+	<delete id="deleteByIds">
+		delete from custom_user
+		<where>
+			user_id IN
+			<foreach collection="ids" index="0" item="id" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</delete>
+
+	<select id="selectCountCurrTable" resultType="java.lang.Integer">
+		select count(1) from INFORMATION_SCHEMA.TABLES
+		where TABLE_SCHEMA=#{dbName} and TABLE_NAME='custom_user'
+	</select>
+
+	<select	id="getDataListByConditions" resultMap="CustomUserRM">
+		select cu.user_id, cu.display_name, cu.icon, cu.about_me, cu.sex, cu.age, cu.email_hash,
+		cu.location, cu.up_votes, cu.down_votes, cu.reputation, cu.views, cu.website_url,
+		cu.create_date, cu.modify_date, cu.last_access_date from custom_user cu
+		<where>
+			<if test="displayName!=null and displayName!=''">
+				and cu.display_name like #{displayName}
+			</if>
+			<if test="icon!=null and icon!=''">
+				and cu.icon like #{icon}
+			</if>
+			<if test="aboutMe!=null and aboutMe!=''">
+				and cu.about_me like #{aboutMe}
+			</if>
+			<if test="sex != null">
+				and cu.sex = #{sex}
+			</if>
+			<if test="minAge != null">
+				and cu.age <![CDATA[>=]]> #{minAge}
+			</if>
+			<if test="maxAge != null">
+				and cu.age <![CDATA[<=]]> #{maxAge}
+			</if>
+			<if test="emailHash!=null and emailHash!=''">
+				and cu.email_hash like #{emailHash}
+			</if>
+			<if test="location!=null and location!=''">
+				and cu.location like #{location}
+			</if>
+			<if test="minUpVotes != null">
+				and cu.up_votes <![CDATA[>=]]> #{minUpVotes}
+			</if>
+			<if test="maxUpVotes != null">
+				and cu.up_votes <![CDATA[<=]]> #{maxUpVotes}
+			</if>
+			<if test="minDownVotes != null">
+				and cu.down_votes <![CDATA[>=]]> #{minDownVotes}
+			</if>
+			<if test="maxDownVotes != null">
+				and cu.down_votes <![CDATA[<=]]> #{maxDownVotes}
+			</if>
+			<if test="minReputation != null">
+				and cu.reputation <![CDATA[>=]]> #{minReputation}
+			</if>
+			<if test="maxReputation != null">
+				and cu.reputation <![CDATA[<=]]> #{maxReputation}
+			</if>
+			<if test="minViews != null">
+				and cu.views <![CDATA[>=]]> #{minViews}
+			</if>
+			<if test="maxViews != null">
+				and cu.views <![CDATA[<=]]> #{maxViews}
+			</if>
+			<if test="websiteUrl!=null and websiteUrl!=''">
+				and cu.website_url like #{websiteUrl}
+			</if>
+
+			<!-- 按时间查询（创建时间和修改时间，以及最后一次访问时间）-->
+			<if test="beginCreateDate != null">
+				and cu.create_date <![CDATA[>=]]> #{beginCreateDate}
+			</if>
+			<if test="endCreateDate != null">
+				and cu.create_date <![CDATA[<=]]> #{endCreateDate}
+			</if>
+			<if test="beginModifyDate != null">
+				and cu.modify_date <![CDATA[>=]]> #{beginModifyDate}
+			</if>
+			<if test="endModifyDate != null">
+				and cu.modify_date <![CDATA[<=]]> #{endModifyDate}
+			</if>
+			<if test="beginLastAccessDate != null">
+				and cu.last_access_date <![CDATA[>=]]> #{beginLastAccessDate}
+			</if>
+			<if test="endLastAccessDate != null">
+				and cu.last_access_date <![CDATA[<=]]> #{endLastAccessDate}
+			</if>
+		</where>
+		order by cu.create_date desc, cu.user_id desc
+	</select>
+	
+	<insert id="addList">
+		insert into custom_user(display_name, icon, about_me, sex, age, email_hash,
+				location, up_votes, down_votes, reputation, views, website_url,
+				create_date, modify_date, last_access_date) VALUES
+			   <foreach collection="userList" item="cu" index="0" separator=",">
+				   (#{cu.displayName}, #{cu.icon}, #{cu.aboutMe}, #{cu.sex}, #{cu.age}, #{cu.emailHash},
+				   #{cu.location}, #{cu.upVotes}, #{cu.downVotes}, #{cu.reputation}, #{cu.views}, #{cu.websiteUrl},
+				   #{cu.createDate}, #{cu.modifyDate}, #{cu.lastAccessDate})
+			   </foreach>
+	</insert>
+
+	<!-- 根据条件查询某用户的推荐用户数据集合 -->
+	<select id="selectRecUserDataByUserId"  resultMap="CustomUserRM">
+		select cu.user_id, cu.display_name, cu.icon, cu.about_me, cu.sex, cu.age, cu.email_hash,
+		cu.location, cu.up_votes, cu.down_votes, cu.reputation, cu.views, cu.website_url,
+		cu.create_date, cu.modify_date, cu.last_access_date from custom_user cu
+					<where>
+						<!-- 选中用户的userId-->
+						<if test="orginalUserId!=null and orginalUserId!=''">
+							cu.user_id in (
+									select distinct custom_user_id from custom_user_group where group_type in (
+											select group_type from custom_user_group cug where cug.custom_user_id=#{orginalUserId}
+									) and custom_user_id!=#{orginalUserId}
+							)
+						</if>
+						<!-- 查询条件 -->
+						<if test="displayName!=null and displayName!=''">
+							and cu.display_name like #{displayName}
+						</if>
+						<if test="icon!=null and icon!=''">
+							and cu.icon like #{icon}
+						</if>
+						<if test="aboutMe!=null and aboutMe!=''">
+							and cu.about_me like #{aboutMe}
+						</if>
+						<if test="emailHash!=null and emailHash!=''">
+							and cu.email_hash like #{emailHash}
+						</if>
+						<if test="location!=null and location!=''">
+							and cu.location like #{location}
+						</if>
+						<if test="websiteUrl!=null and websiteUrl!=''">
+							and cu.website_url like #{websiteUrl}
+						</if>
+					</where>
+	</select>
+	
+	<select id="selectUserAgeCnt" resultType="java.util.HashMap">
+		select if(cu.age, cu.age, '无') as age, count(*) as cnt from custom_user cu group by cu.age
+	</select>
+</mapper>

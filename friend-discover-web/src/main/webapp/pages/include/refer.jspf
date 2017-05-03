@@ -1,0 +1,22 @@
+<meta charset="utf-8">
+<meta http-equiv="pragma" content="no-cache"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<base href='<%=request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/"%>'>
+<script src="assets/library/jquery/jquery-3.2.0.min.js"></script>
+<script src="assets/library/jquery/jquery-migrate-1.4.1.min.js"></script>
+<script src="assets/library/jquery/jquery.sha256.min.js"></script>
+<script src="assets/library/easyui/jquery.easyui.min.js"></script>
+<script src="assets/library/easyui/locale/easyui-lang-zh_CN.js"></script>
+<script src="assets/sea.js"></script>
+<script src="assets/seajsConfig.js"></script>
+<!-- icon setting -->
+<link rel="shortcut icon" href="assets/images/favicon.ico">
+<!-- jQuery LigerUI -->
+<link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/easyui.css" />
+<link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/icon.css" />
+<link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/color.css" />
+<!-- Application Setting -->
+<link rel="stylesheet" type="text/css" href="assets/css/admin/main.css"/>
+<link rel="stylesheet" type="text/css" href="assets/css/public.css"/>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminRoleMapper">
+	<resultMap id="roleRM" type="com.yo.friendis.common.admin.model.AdminRole" >
+	</resultMap>
+	
+	<resultMap id="ResourceResultMap" type="com.yo.friendis.common.admin.model.Resource" >
+		<collection property="actions" ofType="string">
+			<result column="action" />
+		</collection>
+	</resultMap>
+	
+	<select id="searchUsersByRoleIdKeywordFilter" resultType="com.yo.friendis.common.admin.model.view.VRoleUser">
+		select t1.* ,if(t2.role_id, 1, 0)as assigned
+		from admin_user t1
+		left join admin_user_role t2 on t1.user_id = t2.user_id and t2.role_id = #{roleId}
+		<where>
+			<choose>
+				<when test="filter == 'assigned'">
+					if(t2.role_id,1, 0) = 1
+				</when>
+				<when test="filter == 'unassigned'">
+					if(t2.role_id,1, 0) = 0
+				</when>
+			</choose>
+			<if test=" keyword != null and keyword != '' ">
+				and t1.user_name like #{keyword}
+			</if>
+		</where>
+		order by t1.user_name
+	</select>
+	
+	<select id="countAdminRole" resultType="int">
+		SELECT COUNT(*) FROM admin_role
+	</select>
+	
+	<insert id="addAdminRole">
+		INSERT INTO admin_role
+		(role_id, create_time,
+		role_name, description)
+		VALUES
+		(#{roleId,jdbcType=VARCHAR}, now(),
+		#{roleName,jdbcType=VARCHAR}, #{roleDescription,jdbcType=VARCHAR})
+	</insert>
+	<select id="getAdminRole" resultType="hashmap" parameterType="hashmap">
+		<if test=" end - start > 0 ">
+			<include refid="Mapper.page_pre"/>
+		</if>
+		SELECT * FROM admin_role
+		<if test=" end - start > 0 ">
+			<include refid="Mapper.page_suffix"/>
+		</if>
+	</select>
+	<select id="getRoleIdsByUserId" resultType="string">
+	select t2.role_id
+	  from admin_user_role t2
+	 where 
+	  t2.user_id = #{userId}
+	</select>
+
+	<update id="updateAdminRole">
+		UPDATE admin_role SET role_NAME = #{roleName},
+		role_DESCRIPTION = #{roleDescription,jdbcType=VARCHAR}, UPDATE_TIME =
+		SYSDATE WHERE
+		role_id = #{roleId}
+	</update>
+	
+	<update id="updateRolePermission" parameterType="com.yo.friendis.common.admin.model.AdminRolePermission" >
+		UPDATE admin_role_permission SET
+		permission=#{permission},
+		ACTION=#{action}
+		WHERE role_id=#{roleId}
+		AND NAME=#{name} 
+		AND PRIMKEY=#{primkey}		
+	</update>
+	
+	<delete id="deleteRolePermission">
+		DELETE
+		FROM
+		admin_role_permission
+		WHERE
+		role_id = #{roleId}
+		AND NAME = #{name}
+		AND PRIMKEY = #{primkey}
+	</delete>
+	
+	<insert id="addRolePermission">
+		INSERT INTO admin_role_permission (
+		role_id,
+		permission,
+		ACTION,
+		NAME,
+		PRIMKEY
+		) VALUES (
+		#{roleId,jdbcType=VARCHAR},
+		#{permission,jdbcType=VARCHAR},
+		#{action,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR},
+		#{primkey,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<delete id="delRoleAdmins">
+		DELETE FROM admin_role_permission WHERE role_id = #{roleId}
+	</delete>
+	
+	<delete id="deleteAdminRole" parameterType="list">
+		DELETE FROM admin_role
+		<where>
+			role_id IN
+			<foreach collection="list" item="id" open="(" close=")"
+				separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</delete>
+	
+	<delete id="delUsersByRoleId">
+		DELETE FROM admin_user_role WHERE role_id = #{roleId}
+	</delete>
+	
+	<select id="getResources" parameterType="hashmap" resultMap="ResourceResultMap">
+		SELECT * FROM admin_role_permission WHERE role_id= #{roleId} AND name=#{name}
+		<if test=" primkeys != null and primkeys.length > 0">
+			AND primkey IN
+			<foreach collection="primkeys" item="key" open="(" separator="," close=")">
+				#{key}
+			</foreach>
+		</if>
+	</select>
+	
+	<delete id="deleteUserRoleByRoleId">
+		DELETE FROM admin_user_role WHERE role_id = #{roleId}
+	</delete>
+</mapper>

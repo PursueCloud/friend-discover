@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.core.hadoop.mapper.HadoopCfgConstMapper">
+	<resultMap type="com.yo.friendis.core.hadoop.model.HadoopCfgConst" id="HadoopCfgConstRM">
+	</resultMap>
+
+	<select id="dropTable" >
+		drop table hadoop_cfg_const
+	</select>
+
+	<!-- 创建hadoop配置常量表（存储hadoop云平台参数数据）-->
+	<select id="createTable" >
+		create table hadoop_cfg_const
+		(
+			const_id int(10) unsigned not null auto_increment,
+			const_key varchar(255) not null,
+			const_value varchar(255) not null,
+			create_date datetime,
+			modify_date datetime,
+			description varchar(512),
+			primary key using btree(const_id)
+		)  engine=InnoDB default charset=utf8
+	</select>
+
+	<select id="selectCountCurrTable" resultType="java.lang.Integer">
+		select count(1) from INFORMATION_SCHEMA.TABLES
+						where TABLE_SCHEMA=#{dbName} and TABLE_NAME='hadoop_cfg_const'
+	</select>
+
+	<select	id="getDataListByConditions" resultMap="HadoopCfgConstRM">
+		select hcc.const_id, hcc.const_key, hcc.const_value, hcc.create_date, hcc.modify_date, hcc.description from hadoop_cfg_const hcc
+		<where>
+			<if test="constKey!=null and constKey!=''">
+				and hcc.const_key like #{constKey}
+			</if>
+			<if test="constValue!=null and constValue!=''">
+				and hcc.const_value like #{const_value}
+			</if>
+			<if test="description!=null and description!=''">
+				and hcc.description like #{description}
+			</if>
+
+			<!-- 按时间查询（创建时间和修改时间）-->
+			<if test="beginCreateDate != null">
+				and hcc.create_date <![CDATA[>=]]> #{beginCreateDate}
+			</if>
+			<if test="endCreateDate != null">
+				and hcc.create_date <![CDATA[<=]]> #{endCreateDate}
+			</if>
+			<if test="beginModifyDate != null">
+				and hcc.modify_date <![CDATA[>=]]> #{beginModifyDate}
+			</if>
+			<if test="endModifyDate != null">
+				and hcc.modify_date <![CDATA[<=]]> #{endModifyDate}
+			</if>
+		</where>
+		order by hcc.create_date desc, hcc.const_id desc
+	</select>
+
+
+	<select id="selectByIds" resultMap="HadoopCfgConstRM">
+		select hcc.const_id, hcc.const_key, hcc.const_value, hcc.create_date, hcc.modify_date, hcc.description from hadoop_cfg_const hcc
+		<where>
+			hcc.const_id IN
+			<foreach collection="ids" index="0" item="id" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</select>
+
+	<delete id="deleteAll">
+		delete from hadoop_cfg_const
+	</delete>
+
+	<delete id="deleteByIds">
+		delete from hadoop_cfg_const
+		<where>
+			const_id IN
+			<foreach collection="ids" index="0" item="id" open="(" close=")" separator=",">
+				#{id}
+			</foreach>
+		</where>
+	</delete>
+</mapper>

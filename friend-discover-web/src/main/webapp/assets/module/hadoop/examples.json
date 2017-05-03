@@ -1,0 +1,140 @@
+[
+  {
+    "exampleId": 0,
+    "exampleName": "wordcount",
+    "exampleDesc": "A map/reduce program that counts the words in the input files.",
+    "usage": "wordcount：&nbsp;&nbsp;参数1：input(file or directory path),&nbsp;&nbsp;参数2：output(directory path)"
+  },
+  {
+    "exampleId": 1,
+    "exampleName": "pi",
+    "exampleDesc": "A map/reduce program that estimates Pi using a quasi-Monte Carlo method.",
+    "usage": "pi：&nbsp;&nbsp;参数1：mapperNums,&nbsp;&nbsp;参数2：reducerNums"
+  },
+  {
+    "exampleId": 2,
+    "exampleName": "max temperature",
+    "exampleDesc": "Find the max temperature in each year.",
+    "usage": "maxtemperature：&nbsp;&nbsp;参数1：input(file or directory path),&nbsp;&nbsp;参数2：output(directory path)"
+  },
+  {
+    "exampleId": 3,
+    "exampleName": "wordmean",
+    "exampleDesc": "A map/reduce program that counts the average length of the words in the input files.",
+    "usage": ""
+  },
+  {
+    "exampleId": 4,
+    "exampleName": "wordmedian",
+    "exampleDesc": "wordstandarddeviation",
+    "usage": ""
+  },
+  {
+    "exampleId": 5,
+    "exampleName": "wordstandarddeviation",
+    "exampleDesc": "A map/reduce program that counts the standard deviation of the length of the words in the input files.",
+    "usage": ""
+  },
+  {
+    "exampleId": 6,
+    "exampleName": "aggregatewordcount",
+    "exampleDesc": "An Aggregate based map/reduce program that counts the words in the input files.",
+    "usage": ""
+  },
+  {
+    "exampleId": 7,
+    "exampleName": "aggregatewordhist",
+    "exampleDesc": "An Aggregate based map/reduce program that computes the histogram of the words in the input files.",
+    "usage": ""
+  },
+  {
+    "exampleId": 8,
+    "exampleName": "grep",
+    "exampleDesc": "A map/reduce program that counts the matches of a regex in the input.",
+    "usage": ""
+  },
+  {
+    "exampleId": 9,
+    "exampleName": "randomwriter",
+    "exampleDesc": "A map/reduce program that writes 10GB of random data per node.",
+    "usage": ""
+  },
+  {
+    "exampleId": 10,
+    "exampleName": "randomtextwriter",
+    "exampleDesc": "A map/reduce program that writes 10GB of random textual data per node.",
+    "usage": ""
+  },
+  {
+    "exampleId": 11,
+    "exampleName": "sort",
+    "exampleDesc": "A map/reduce program that sorts the data written by the random writer.",
+    "usage": ""
+  },
+  {
+    "exampleId": 12,
+    "exampleName": "bbp",
+    "exampleDesc": "A map/reduce program that uses Bailey-Borwein-Plouffe to compute exact digits of Pi.",
+    "usage": ""
+  },
+  {
+    "exampleId": 13,
+    "exampleName": "distbbp",
+    "exampleDesc": "A map/reduce program that uses a BBP-type formula to compute exact bits of Pi.",
+    "usage": ""
+  },
+  {
+    "exampleId": 14,
+    "exampleName": "pentomino",
+    "exampleDesc": "A map/reduce tile laying program to find solutions to pentomino problems.",
+    "usage": ""
+  },
+  {
+    "exampleId": 15,
+    "exampleName": "secondarysort",
+    "exampleDesc": "An example defining a secondary sort to the reduce.",
+    "usage": ""
+  },
+  {
+    "exampleId": 16,
+    "exampleName": "sudoku",
+    "exampleDesc": "A sudoku solver.",
+    "usage": ""
+  },
+  {
+    "exampleId": 17,
+    "exampleName": "join",
+    "exampleDesc": "A job that effects a join over sorted, equally partitioned datasets",
+    "usage": ""
+  },
+  {
+    "exampleId": 18,
+    "exampleName": "multifilewc",
+    "exampleDesc": "A job that counts words from several files.",
+    "usage": ""
+  },
+  {
+    "exampleId": 19,
+    "exampleName": "dbcount",
+    "exampleDesc": "An example job that count the pageview counts from a database.",
+    "usage": ""
+  },
+  {
+    "exampleId": 20,
+    "exampleName": "teragen",
+    "exampleDesc": "Generate data for the terasort",
+    "usage": ""
+  },
+  {
+    "exampleId": 21,
+    "exampleName": "terasort",
+    "exampleDesc": "Run the terasort",
+    "usage": ""
+  },
+  {
+    "exampleId": 22,
+    "exampleName": "teravalidate",
+    "exampleDesc": "Checking results of terasort",
+    "usage": ""
+  }
+]

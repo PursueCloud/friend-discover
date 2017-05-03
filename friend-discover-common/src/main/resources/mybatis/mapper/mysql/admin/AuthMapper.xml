@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminRolePermissionMapper">
+	<resultMap type="com.yo.friendis.common.admin.model.Resource" id="ResourceRM">
+		<result column="role_id" property="roleId" />
+		<result column="name" property="name" />
+		<result column="primkey" property="primkey" />
+		<collection property="actions" ofType="string">
+			<result column="action" />
+		</collection>
+	</resultMap>
+
+	<select id="searchResources" resultMap="ResourceRM">
+		select * from admin_role_permission t where t.name=#{name} and t.role_id=#{roleId}
+		<if test="keyword != null and keyword != '' ">
+			and t.primkey like #{keyword}
+		</if>
+	</select>
+</mapper>

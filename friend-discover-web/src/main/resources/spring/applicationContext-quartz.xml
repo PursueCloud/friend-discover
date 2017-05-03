@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- quartz任务调度配置 -->
+	<!-- 配置调度器工厂(SchedulerFactoryBean) -->  
+    <bean name="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">  
+        <property name="triggers">  
+            <list>  
+                <ref bean="jobTrigger_backupDB" />
+            </list>
+        </property>  
+    </bean>  
+    <!-- 配置Cron触发器(CronTriggerFactoryBean) -->  <!-- 数据库备份 -->
+    <bean id="jobTrigger_backupDB" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">  
+            <ref bean="jobDetail_backupDB" />
+        </property>  
+        <property name="cronExpression">  
+            <!-- 每周星期六凌晨1点执行一次(Cron表达式的格式：秒 分 时 日 月 周 年(可选),L代表最后，周六即是一周之中最后一天) -->  
+            <value>0 0 1 ? * 1</value>
+        </property>  
+    </bean> 
+    <!-- 配置方法调用任务工厂(XXXJobDetailFactoryBean) -->  <!-- 数据库备份 -->
+    <bean id="jobDetail_backupDB" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">  
+            <ref bean="job_backupDB" />
+        </property>  
+        <property name="targetMethod">  
+            <value>backupDB</value><!-- 数据库备份 -->
+        </property>  
+    </bean>  
+    <!-- 配置自定义的时间任务(Job) -->  
+    <!--<bean id="job_backupDB" class="com.yo.friendis.quartz.BackupDBTask" />&lt;!&ndash; 数据库备份 &ndash;&gt;-->
+</beans>

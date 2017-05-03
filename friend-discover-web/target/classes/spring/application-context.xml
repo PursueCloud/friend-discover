@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/websocket
+        http://www.springframework.org/schema/websocket/spring-websocket.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/task  
+		http://www.springframework.org/schema/task/spring-task.xsd 
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	<!-- 读入properties文件，放入数据库连接 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list> 
+				<value>classpath:/db-config.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 启动@AspectJ支持 -->
+	<!-- proxy-target-class默认"false",更改为"ture"使用CGLib动态代理 -->    
+	<aop:aspectj-autoproxy proxy-target-class="true"/> 
+
+	<!-- 自动扫描业务类组件 -->
+	<context:component-scan base-package="com.yo" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	
+	<!-- 使用CGLIB代理 -->
+	<aop:config proxy-target-class="true"/>
+	<task:annotation-driven executor="executor" scheduler="scheduler"/>
+	<task:executor id="executor" pool-size="20"/>
+	<task:scheduler id="scheduler" pool-size="20"/>
+
+	<!-- 配置Druid -->
+	<bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+		<property name="mergeSql" value="true" />
+		<property name="slowSqlMillis" value="10000" />
+		<property name="logSlowSql" value="true" />
+	</bean>
+	<!-- 数据源1 -->
+	<bean id="ds1" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.password}" />
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="${initialSize}" />
+		<property name="minIdle" value="${minIdle}" />
+		<property name="maxActive" value="${maxActive}" />
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1 from dual" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+		<!-- 配置监控统计记录 -->
+		<property name="filters" value="slf4j" />
+		<!-- 配置监控统计拦截的filters -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="stat-filter" />
+			</list>
+		</property>
+	</bean>
+	<!-- 备用数据源2 -->
+	<bean id="ds2" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${db2.url}" />
+		<property name="username" value="${db2.username}" />
+		<property name="password" value="${db2.password}" />
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="${initialSize}" />
+		<property name="minIdle" value="${minIdle}" />
+		<property name="maxActive" value="${maxActive}" />
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1 from dual" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize"
+			value="20" />
+		<!-- 配置监控统计记录 -->
+		<property name="filters" value="slf4j" />
+		<!-- 配置监控统计拦截的filters -->
+		<property name="proxyFilters">
+			<list>
+				<ref bean="stat-filter" />
+			</list>
+		</property>
+	</bean>
+	<!-- 多数据源配置 -->
+	<bean id="dyDataSource" class="com.yo.friendis.common.common.jdbc.DynamicDataSource">
+		<property name="defaultTargetDataSource" ref="ds1" />
+		<property name="targetDataSources">
+			<map>
+				<entry key="ds1" value-ref="ds1" />
+ 				<entry key="ds2" value-ref="ds2" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 配置MyBatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--dataSource属性指定要用到的连接池 -->
+		<property name="dataSource" ref="dyDataSource" />
+		<!--configLocation属性指定mybatis的核心配置文件 -->
+		<property name="configLocation" value="classpath:spring/mybatis-configuration.xml" />
+		<property name="mapperLocations" value="classpath*:mybatis/mapper/${sql.dialect}/**/*.xml" />
+	</bean>
+	<bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.yo.friendis.**.**.mapper" />
+		<!-- 禁用顶层接口后所有mapper均可扫描 -->
+		<!-- <property name="markerInterface" value="tk.mybatis.mapper.common.Mapper"/> -->
+		<property name="properties">
+			<value>
+				ORDER=BEFORE
+			</value>
+		</property>
+	</bean>
+
+	<!-- 配置事务管理器 -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dyDataSource" />
+	</bean>
+	<!-- 注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="txManager" />
+	<!-- the transactional advice (what 'happens'; see the <aop:advisor/> bean 
+		below) -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<!-- the transactional semantics... -->
+		<tx:attributes>
+			<!-- all methods starting with 'get' are read-only -->
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="select*" read-only="true" />
+			<tx:method name="count*" read-only="true" />
+			<tx:method name="search*" read-only="true" />
+			<tx:method name="list*" read-only="true" />
+			<tx:method name="find*" read-only="true" />
+			<!-- other methods use the default transaction settings (see below) -->
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- shiro -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="loginUrl" value="/admin/login" />
+		<property name="successUrl" value="/admin" />
+		<property name="securityManager" ref="securityManager" />
+		<property name="filterChainDefinitions">
+			<value>
+				# some example chain definitions:
+				/assets/** = anon
+				/services/** = anon
+				/asyn/** = anon
+				/http/** = anon
+				/httpResp/** = anon
+				/admin/login = authc
+				/admin/logout = logout
+				/** = user
+				# more
+				#URL-to-FilterChain definitions here
+			</value>
+		</property>
+	</bean>
+	<bean id="shiroSessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="cacheManager" ref="shiroCacheManager"/>
+	</bean>
+	
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="myRealm" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+	<bean id="shiroCacheManager" class="com.yo.friendis.common.shiro.cache.ShiroCacheManager" />
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	<bean id="myRealm" class="com.yo.friendis.common.shiro.realms.Realm"/>
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="org.apache.shiro.SecurityUtils.setSecurityManager" />
+		<property name="arguments" ref="securityManager" />
+	</bean>
+
+	<!-- spring 缓存 -->
+	<cache:annotation-driven />
+	<!-- 开发时可用，或者单应用时使用 -->
+	<bean id="cacheManager" class="com.yo.friendis.common.cache.SimpleCacheManager"></bean>
+
+	<!-- redis 缓存 -->
+ 	<!--<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">-->
+ 		<!--<property name="maxTotal" value="${jedis.maxTotal}"/>-->
+ 		<!--<property name="maxIdle" value="${jedis.maxIdle}"/>-->
+ 		<!--<property name="minIdle" value="${jedis.minIdle}"/>-->
+ 	<!--</bean>-->
+  	<!--<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" c:poolConfig-ref="jedisPoolConfig"-->
+		  <!--p:hostName="${redis.host}"-->
+		  <!--p:port="${redis.port}"-->
+		  <!--p:database="${redis.db}"/>-->
+ 	<!--<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" p:connectionFactory-ref="jedisConnectionFactory">-->
+ 	   <!--<property name="defaultSerializer">-->
+             <!--<bean class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"></bean>-->
+         <!--</property>-->
+         <!--<property name="keySerializer">-->
+             <!--<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>-->
+         <!--</property>-->
+         <!--<property name="hashKeySerializer">-->
+             <!--<bean class="org.springframework.data.redis.serializer.StringRedisSerializer"></bean>-->
+         <!--</property>-->
+ 	<!--</bean>-->
+ 	<!--<bean id="cacheManager" class="com.yo.friendis.common.cache.RedisCacheManager" c:redisOperations-ref="redisTemplate"/>-->
+
+	<!--导入quartz配置文件-->
+	<!--<import resource="applicationContext-quartz.xml" />-->
+</beans>

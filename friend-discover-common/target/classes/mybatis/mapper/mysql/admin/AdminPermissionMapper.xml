@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminPermissionMapper">
+	<!-- 获取角色所有权限 -->
+	<select id="getPermissionByRole" resultType="String">
+		select t1.permission from admin_role_permission t1 where t1.role_id = #{roleId}
+	</select>
+	
+	<select id="getPermissionByBtn" resultType="String">
+		select t1.permission from admin_role_permission t1 where t1.role_id = #{roleId}
+		 and t1.action  IN ('delete') 
+	</select>
+	
+</mapper>

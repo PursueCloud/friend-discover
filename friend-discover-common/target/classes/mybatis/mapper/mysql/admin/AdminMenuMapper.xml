@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminMenuMapper">
+	<resultMap type="com.yo.friendis.common.admin.model.AdminMenu" id="MenuRM">
+		<id column="menu_id" property="menuId" />
+		<collection property="subMenu" ofType="com.yo.friendis.common.admin.model.AdminMenu" column="menu_id" select="selectAllRecursiveByParentId" />
+	</resultMap>
+	<resultMap type="com.yo.friendis.common.admin.bean.PMenu" id="PMenuRM">
+	    <id column="menu_id" property="menuId"/>
+		<collection property="actions" ofType="string">
+			<result column="action"/>
+		</collection>
+	</resultMap>
+	<!-- 递归获取所有菜单 -->
+	<select id="selectAllRecursiveByParentId" resultMap="MenuRM">
+		select * from admin_menu where p_menu_id = #{pMenuId} order by menu_order
+	</select>
+	
+	<select id="selectChildsMenuIdByParentId" resultType="string">
+		select menu_id from admin_menu where p_menu_id = #{pMenuId}
+	</select>
+
+	<select id="selectMenusForPerms" resultMap="PMenuRM">
+		select t1.* ,t2.action from 
+	(
+		select t1.* from admin_menu t1
+		<where>
+			<if test="pMenuId != null and pMenuId !='' ">
+				t1.p_menu_id = #{pMenuId}
+			</if>
+		</where>
+	)
+	t1 left join admin_role_permission t2 on t1.menu_id=t2.primkey and t2.name='Menu' and t2.role_id= #{roleId}
+	</select>
+</mapper>

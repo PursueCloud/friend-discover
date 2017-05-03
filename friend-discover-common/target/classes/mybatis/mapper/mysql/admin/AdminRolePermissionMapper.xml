@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminRolePermissionMapper">
+	<!-- 复制授权信息 -->
+	<insert id="cloneRolePermission">
+	insert into admin_role_permission
+	  (role_id, permission, action, name, primkey)
+	  select t.role_id,
+	         t.name || ':' || t.action || ':' || #{dest} as permission,
+	         t.action,
+	         t.name,
+	         #{dest} as primkey
+	    from admin_role_permission t
+	   where t.name = #{name}
+	     and t.primkey = #{source}
+	</insert>
+
+	<delete id="deleteRolePermissionByRoleId">
+		delete from admin_user_role aru where aru.role_id = #{roleId}
+	</delete>
+</mapper>

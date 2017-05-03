@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="friend-discover-common:jar">
+    <output-path>$PROJECT_DIR$/friend-discover-common/target</output-path>
+    <root id="archive" name="friend-discover-common.jar">
+      <element id="module-output" name="friend-discover-common" />
+    </root>
+  </artifact>
+</component>

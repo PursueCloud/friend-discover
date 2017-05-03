@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.common.admin.mapper.AdminUserMapper">
+	<resultMap type="com.yo.friendis.common.admin.model.AdminUser" id="UserRM">
+	</resultMap>
+	
+	<select id="getUsers" resultMap="UserRM">
+		SELECT * FROM admin_user
+	</select>
+
+	<select id="getUsersByRole" resultMap="UserRM">
+		SELECT u.* FROM
+		admin_user u, admin_user_role ur WHERE u.user_id=ur.user_id AND
+		ur.role_id = #{roleId}
+	</select>
+
+	<select id="getUserByUserId" resultMap="UserRM">
+		SELECT * FROM
+		admin_user WHERE user_id = #{userId}
+	</select>
+
+	<select id="getUserIdByName" resultType="string">
+		select user_id from
+		admin_user where user_name=#{userName}
+	</select>
+	
+	<select id="getUserByUserName" resultMap="UserRM">
+		SELECT * FROM admin_user
+		<where>
+			user_name=#{userName}
+		</where>
+	</select>
+	
+	<select id="countAdminUser" resultType="int">
+		SELECT COUNT(*) from admin_user
+		<where>
+			<if test="userName != null and userName != '' ">
+				AND user_name LIKE #{userName}
+			</if>
+			<if test="screenName != null and screenName != '' ">
+				AND account LIKE #{screenName}
+			</if>
+		</where>
+	</select>
+
+	<select id="getAdminUser" resultMap="UserRM" parameterType="hashmap">
+		<if test=" end - start > 0 ">
+			<include refid="Mapper.page_pre"></include>
+		</if>
+		SELECT * FROM admin_user
+		<where>
+			<if test="userName != null and userName != '' ">
+				AND user_name LIKE #{userName}
+			</if>
+			<if test="screenName != null and screenName != '' ">
+				AND account LIKE #{screenName}
+			</if>
+		</where>
+		<if test=" end - start > 0 ">
+			<include refid="Mapper.page_suffix"></include>
+		</if>
+	</select>
+	
+	<insert id="addUserRole">
+		INSERT INTO admin_user_role (role_id,user_id)
+		VALUES(
+			#{roleId,jdbcType=VARCHAR},
+			#{userId,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="editRolePas">
+		UPDATE admin_user SET password=#{newPas}, modify_time=now() WHERE user_id=#{userId}
+	</update>
+	
+	<delete id="deleteUserRoleByUserId">
+		DELETE FROM admin_user_role WHERE user_id = #{userId}
+	</delete>
+	
+	<select id="getUsersByRoleId" resultMap="UserRM">
+		SELECT u.* FROM
+		admin_user u, admin_user_role ur WHERE u.user_id=ur.user_id AND
+		ur.role_id = #{roleId}
+	</select>
+	
+	<select id="getUnSelUsersByRoleId" resultMap="UserRM">
+		SELECT * FROM admin_user T1
+ 		WHERE T1.user_id NOT IN(SELECT user_id FROM admin_user_role T2 WHERE T2.role_id = #{roleId})
+	</select>
+
+	<select id="getUsersByRoleIdAndLike" resultMap="UserRM">
+		SELECT U.* FROM
+		admin_user U, admin_user_role UR WHERE U.user_id=UR.user_id AND
+		UR.role_id = #{roleId} AND U.user_name LIKE '%'||#{keyword}||'%'
+	</select>
+	
+	<select id="getUnSelUsersByRoleIdAndLike" resultMap="UserRM">
+		SELECT * FROM admin_user T1
+ 		WHERE T1.user_id NOT IN(SELECT user_id FROM admin_user_role T2 WHERE T2.role_id = #{roleId})
+ 		AND T1.user_name LIKE '%'||#{keyword}||'%'
+	</select>
+
+</mapper>

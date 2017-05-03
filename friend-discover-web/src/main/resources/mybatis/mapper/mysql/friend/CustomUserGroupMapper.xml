@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yo.friendis.web.friend.mapper.CustomUserGroupMapper">
+	<resultMap type="com.yo.friendis.web.friend.model.CustomUserGroup" id="CustomUGRM">
+	</resultMap>
+
+	<select id="dropTable" >
+		drop table custom_user_group
+	</select>
+
+	<!-- 创建聚类分组用户组别表（存储聚类分群后每个用户的组别）-->
+	<select id="createTable" >
+		create table custom_user_group
+		(
+			user_group_id int(11) unsigned not null,
+			group_type int(11),
+			custom_user_id int(11) unsigned not null,
+			primary key using btree(user_group_id),
+			constraint fk_cug_uid foreign key (custom_user_id) references custom_user(user_id)
+		) engine=InnoDB default charset=utf8
+	</select>
+
+	<delete id="deleteAll">
+		delete from custom_user_group
+	</delete>
+	
+	<select id="selectCountByGroupType" resultType="java.lang.Integer">
+		select count(1) from custom_user_group cug where cug.group_type=#{groupType}
+	</select>
+
+	<select id="selectCountCurrTable" resultType="java.lang.Integer">
+		select count(1) from INFORMATION_SCHEMA.TABLES
+		where TABLE_SCHEMA=#{dbName} and TABLE_NAME='custom_user_group'
+	</select>
+
+	<insert id="addList">
+		insert into custom_user_group(custom_user_id, group_type) VALUES
+		<foreach collection="userGroupList" item="cug" index="0" separator=",">
+			(#{cug.customUserId}, #{cug.groupType})
+		</foreach>
+	</insert>
+</mapper>

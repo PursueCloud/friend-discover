@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Mapper">
+	<sql id="page_pre">
+		SELECT
+		*
+		FROM
+		(
+	</sql>
+	<sql id="page_suffix">
+		) A
+		limit #{start},#{end-start}
+	</sql>
+	<sql id="count_pre">
+		select count(*) from (
+	</sql>
+	<sql id="count_suffix">
+		)
+	</sql>
+</mapper>

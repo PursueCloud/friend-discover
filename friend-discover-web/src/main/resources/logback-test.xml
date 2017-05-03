@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n" />
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+
+<!--     <logger name="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" level="debug" /> -->
+<!--     <logger name="org.springframework.web.socket" level="TRACE"></logger> -->
+	<logger name="com.yo" level="debug"></logger>
+	<root level="error">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

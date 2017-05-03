@@ -1,0 +1,28 @@
+html,body{background-color: #d9d7d8;font-size: 14px;height: 100%;overflow: hidden;}
+.header{height: 50px;background-color: #3d4a5b;}
+.header .logo{display: inline-block; margin: 0 0 0 30px;padding-top: 10px;}
+.header .tools{position: absolute;right: 0;top: 10px;}
+.tools .login-info{display: inline-block;text-align: center; width: 87px;height: 26px;background-image: url(../../images/admin/icon_info.png);}
+.icon-person{display: inline-block; width: 17px;height: 21px; background-image: url(../../images/admin/person.png);}
+.tools a,.tools span{color: #fff;}
+.tools .btn-logout{display: inline-block;margin: 0 35px 0 35px; text-indent: -9999em; width: 15px;height: 16px;background-image: url(../../images/admin/icon_out.png);}
+
+.main-box{position: relative;height: calc(100% - 54px);}
+.lr{float: left; margin-left: 30px;  width: 115px;height: 100%;background-color: #3d4a5b;}
+.main-box .content{margin: 0 0px 0 160px ;height: 100%; background-color: #fff;}
+
+
+#nav_menu{position: absolute;width: 115px; list-style: none;margin-top: 35px;}
+#nav_menu .b-menu-item{overflow: hidden;}
+#nav_menu .b-menu-item > a{display: block;float: left;width: 100%; height: 70px;color: #fff;}
+#nav_menu .b-menu-item > a > img{display: block;margin: 8px auto;height: 31px;}
+#nav_menu .b-menu-item > a > span{display: block; text-align: center;}
+
+#nav_menu .sub-menu{display: none; position: absolute;left: 115px;  width: 150px;background-color: #5f6b79;}
+#nav_menu .sub-menu a{display: inline-block; height: 40px;width: 100%;line-height: 40px; text-align: center;color: #fff;}
+
+#nav_menu .menu-hover .sub-menu{display: block;}
+#nav_menu .sub-menu li:hover a{background-color: #3d4a5b;color: #52abcd;}
+
+#nav_slider{position: absolute;left: 0; top:35px; width: 145px; height: 70px;background-color:#5f6b79; }
+#nav_slider .shadow-box{height: 0;width: 0;border-width: 5px 15px;border-style: solid;border-color: transparent #3d4a5b #3d4a5b transparent;top: -10px;left: 0;position: relative;}

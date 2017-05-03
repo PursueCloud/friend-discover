@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/friend-discover.iml" filepath="$PROJECT_DIR$/friend-discover.iml" />
+      <module fileurl="file://$PROJECT_DIR$/friend-discover-common/friend-discover-common.iml" filepath="$PROJECT_DIR$/friend-discover-common/friend-discover-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/friend-discover-core/friend-discover-core.iml" filepath="$PROJECT_DIR$/friend-discover-core/friend-discover-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/friend-discover-web/friend-discover-web.iml" filepath="$PROJECT_DIR$/friend-discover-web/friend-discover-web.iml" />
+    </modules>
+  </component>
+</project>

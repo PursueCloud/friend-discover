@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n" />
+	<appender name="rootFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${catalina.base}/webapps/logs/log-root.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.base}/webapps/logs/log-root.%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	<appender name="friendisFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${catalina.base}/webapps/logs/log-friendis.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.base}/webapps/logs/log-friendis.%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	
+	<root level="debug">
+		<appender-ref ref="rootFile" />
+	</root>
+	<logger name="com.yo" level="debug" additivity="false">
+		<appender-ref ref="friendisFile" />
+	</logger>
+</configuration>
