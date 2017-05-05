@@ -1,12 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ include file="/pages/include/hd.jsp"%>
+<script type="text/javascript" src="assets/library/jquery/jquery.tree.js"></script>
+<link rel="stylesheet" type="text/css" href="assets/css/ehanced.css">
 <style type="text/css">
-    body, div, ul, li, span, a, input, table, tr, td, tbody, thead, * {
-        margin: 0;
-        padding: 0;
-        border: none;
-    }
     body {
         color: #666;
     }
@@ -132,6 +129,78 @@
         color: dodgerblue;
         cursor: pointer;
     }
+    .linear {
+        background: -webkit-gradient(linear, left bottom, left top,
+        from(#eee), color-stop(0.25, #fff),
+        to(#eee), color-stop(0.75, #fff));
+    }
+    .shadow {
+        -moz-box-shadow: 3px 3px 10px #666666;
+        -webkit-box-shadow: 3px 3px 10px #666666;
+        box-shadow: 3px 3px 10px #666666;
+    }
+    .center {
+        display : -webkit-box;
+        display : -moz-box;
+        display : box;
+        -webkit-box-orient : vertical;
+        -webkit-box-pack : center;
+        -webkit-box-align : center;
+        -moz-box-orient : vertical;
+        -moz-box-pack : center;
+        -moz-box-align : center;
+        box-orient: vertical;
+        box-pack: center;
+        box-align: center;
+    }
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+        background-color: #eee;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0, 0.4);
+        border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0,0,0, 0.6);
+    }
+    #container {
+        display: -webkit-box;
+        -webkit-box-orient: horizontal;
+        height: 100%;
+    }
+    #container > div {
+        padding: 10px;
+    }
+    #container > div:first-of-type {
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 300px;
+        border-right: 1px solid #ccc;
+    }
+    #container > div:last-of-type {
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-box-flex: 1;
+    }
+    #progress_bar {
+        display: none;
+    }
+    progress {
+        background-color: black;
+        margin: 10px 0;
+        padding: 1px;
+        border: 1px solid #000;
+        font-size: 14px;
+        width: auto;
+    }
+    progress::-webkit-progress-bar-value {
+        background-color: #99ccff;
+    }
+    .tree ul { margin-left:8px; }
 </style>
 <body>
     <div id="hb_dialog_win"></div>

@@ -326,12 +326,14 @@ define(function(require, exports, module) {
             $('li#upload_file_to_hdfs_li').unbind('click');
             $('li#upload_file_to_hdfs_li').bind('click', function(e) {
                 console.log('上传文件');
+                self.isUploadDir = false;
                 self.openChooseFileOrEnterPathDialog(self.$dialog, null, '250px', '0');
             });
             $('li#upload_folder_to_hdfs_li').unbind('click');
             $('li#upload_folder_to_hdfs_li').bind('click', function(e) {
                 console.log('上传文件夹');
-                self.openChooseFileOrEnterPathDialog(self.$dialog, null, '250px', '0');
+                self.isUploadDir = true;
+                self.openChooseFileOrEnterPathDialog(self.$dialog, null, '350px', '0');
             });
             $('a#mkdir_in_hdfs_a').unbind('click');
             $('a#mkdir_in_hdfs_a').bind('click', function(e) {
@@ -663,6 +665,13 @@ define(function(require, exports, module) {
                             //alert('从hdfs中选择要下载的文件');//弹出一个类似百度网盘的弹出框，供用户选择hdfs中要下载的文件
                             self.chooseFilesInHdfs('#upload_hdfs_path', '选择要下载的文件或文件夹（HDFS）');
                         });
+                    } else {
+                        if( self.isUploadDir ) {
+                            $('td.file-input-box-td').find('span.textbox').find('input[type="file"]').attr('webkitdirectory', 'webkitdirectory');
+                            $('td.file-input-box-td').find('span.textbox').find('input[type="file"]').attr('directory', 'directory');
+                        } else {
+                            $('td.file-input-box-td').find('span.textbox').find('input[type="file"]').removeAttr('webkitdirectory');
+                        }
                     }
                     if( callback ) {
                         callback();
@@ -683,6 +692,10 @@ define(function(require, exports, module) {
                 });
                 $('tr.upload-path-br-tr').show();
                 $('tr.upload-path-tr').show();
+                if(self.isUploadDir) {
+                    $('tr#selected_folder_tr').show();
+                    utils.initUploadDir($('td.file-input-box-td').find('span.textbox').find('input[type="file"]'));
+                }
             } else {
                 self.$form.removeAttr('enctype');
                 self.$form.attr('action', downloadFileFromHDFSRequestUrl);//下载
@@ -697,7 +710,7 @@ define(function(require, exports, module) {
 
             self.$form = $('#hdfs_file_form');
             if( self.cmOpType == '0' ) {
-                self.$form.attr('action', copyToRequestUrl);//上传
+                self.$form.attr('action', copyToRequestUrl);//复制
                 $('span.cm-op-type').text('复制');
                 $('tr.dst-path-tr').find('span.textbox').find('a.textbox-button').unbind('click');
                 $('tr.dst-path-tr').find('span.textbox').find('a.textbox-button').bind('click', function() {
@@ -705,7 +718,7 @@ define(function(require, exports, module) {
                 });
             } else {
                 $('span.cm-op-type').text('移动');
-                self.$form.attr('action', moveToRequestUrl);//下载
+                self.$form.attr('action', moveToRequestUrl);//移动
                 $('tr.dst-path-tr').find('span.textbox').find('a.textbox-button').unbind('click');
                 $('tr.dst-path-tr').find('span.textbox').find('a.textbox-button').bind('click', function() {
                     self.chooseDirsInHdfs('#dst_path');

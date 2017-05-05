@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
@@ -162,7 +163,6 @@ public class HadoopController extends BaseController{
                 }
             }
 
-
             if(currJobList.size()==0){
                 jsonMap.put("finished", "false");
 //    			return ;
@@ -192,20 +192,44 @@ public class HadoopController extends BaseController{
      */
     @RequestMapping("uploadFile2HDFS")
     @ResponseBody
-    public Object uploadFile2HDFS(MultipartFile uploadFile, String uploadHdfsPath){
+    public Object uploadFile2HDFS(List<CommonsMultipartFile> uploadFile, boolean isUploadDir, String uploadHdfsPath){
         boolean success = false;
         String msg = "";
 
         try {
-            String path = request.getSession().getServletContext().getRealPath("/upload/hadoop");
-            String suffix = uploadFile.getOriginalFilename().substring(uploadFile.getOriginalFilename().lastIndexOf("."));
-            String afterUploadFileName = UUID.randomUUID() + suffix;
-            FileUtils.uploadToLoc(uploadFile, path, afterUploadFileName);
-//            String uploadFilePath = path + "/" + uploadFile.getOriginalFilename();
-            Map<String,Object> map = HadoopUtils.upload(path + "/" + afterUploadFileName, HadoopUtils.getHDFSPath(uploadHdfsPath + "/" + uploadFile.getOriginalFilename()));
-            success = (boolean)map.get("success");
-            msg = map.get("msg").toString();
-//        CommonUtils.write2PrintWriter(JSON.toJSONString(map));
+            if( uploadFile!=null && !uploadFile.isEmpty() ) {
+                FileSystem fs = FileSystem.get(HadoopUtils.getConf());//连接到hdfs
+                for(CommonsMultipartFile file : uploadFile) {
+                    String fullPathName = file.getFileItem().getName();
+                    String parentDirName = fullPathName.substring(0, fullPathName.lastIndexOf("/"));
+                    String[] dirArr = parentDirName.split("/");
+                    //判断当前文件所在父目录是否存在，否则新建目录
+                    for(int i=0; i<dirArr.length; i++) {
+                        String currDir = dirArr[i];
+                        String parentDir = "";
+                        if(i > 0) {
+                            for(int j=0; j<i; j++) {//j<j而不是j<=i，因为不包括当前文件路径
+                                parentDir += "/" + dirArr[j];
+                            }
+                        }
+                        Path currDirPath = new Path(uploadHdfsPath + parentDir + "/" + currDir);
+                        boolean existsCurrDir = fs.exists(currDirPath);
+                        if(!existsCurrDir) {
+                            fs.mkdirs(currDirPath);
+                        }
+                    }
+                    String parentPath = uploadHdfsPath + "/" + parentDirName;//父hdfs目录
+                    String path = request.getSession().getServletContext().getRealPath("/upload/hadoop");
+                    String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+                    String afterUploadFileName = UUID.randomUUID() + suffix;
+                    FileUtils.uploadToLoc(file, path, afterUploadFileName);
+        //            String uploadFilePath = path + "/" + uploadFile.getOriginalFilename();
+                    Map<String,Object> map = HadoopUtils.upload(path + "/" + afterUploadFileName,
+                            HadoopUtils.getHDFSPath(parentPath + "/" + file.getOriginalFilename()));
+                    success = (boolean)map.get("success");
+                    msg = map.get("msg").toString();
+                }
+            }
         } catch(Exception e) {
             logger.error(e.getMessage(), e);
             msg = "很抱歉，系统出错，上传失败！";
