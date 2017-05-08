@@ -239,8 +239,8 @@ public class HadoopUtils {
      * @return fs.defaultFs+url
      */
     public static String getHDFSPath(String url) {
-
-        return CommonUtils.getKey("fs.defaultFS", flag) + url;
+        String defaultFs = fs==null ? CommonUtils.getKey("fs.defaultFS", flag) : fs.getConf().get("fs.defaultFS");
+        return defaultFs + url;
     }
     /**
      * 获得Path路径
@@ -294,7 +294,29 @@ public class HadoopUtils {
         }
         return ret;
     }
-
+    /**
+     * 上传本地文件到HFDS(重载的方法）
+     *
+     * @param localPath
+     * @param hdfsPath
+     * @return
+     */
+    public static Map<String, Object> upload(FileSystem fs, String localPath, String hdfsPath) {
+        Map<String, Object> ret = new HashMap<String, Object>();
+        Path src = new Path(localPath);
+        Path dst = new Path(hdfsPath);
+        try {
+            fs.copyFromLocalFile(src, dst);
+            CommonUtils.simpleLog(localPath+"上传至"+hdfsPath+"成功");
+            ret.put("success", true);
+            ret.put("msg", localPath+"上传至"+hdfsPath+"成功");
+        } catch (Exception e) {
+            ret.put("success", false);
+            ret.put("msg", e.getMessage());
+            logger.error(e.getMessage(), e);
+        }
+        return ret;
+    }
     /**
      * 删除HFDS文件或者文件夹
      *

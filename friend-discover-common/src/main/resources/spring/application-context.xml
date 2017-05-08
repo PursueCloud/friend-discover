@@ -17,6 +17,10 @@
         http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
         ">
+
+	<context:component-scan base-package="com.yo" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+	</context:component-scan>
 	<bean id="BeanUtil" class="com.yo.friendis.common.common.util.BeanUtil"/>
 	<bean id="UserUtil" class="com.yo.friendis.common.admin.util.UserUtil" c:user-service-ref="adminUserService"/>
 </beans>

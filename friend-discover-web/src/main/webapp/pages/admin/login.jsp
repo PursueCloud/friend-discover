@@ -84,6 +84,9 @@
             .login-btn:hover {
                 background-color: dodgerblue;
             }
+            #check_code_img:hover{
+                cursor: pointer;
+            }
         </style>
     </head>
 <body class="login-page-bg">
@@ -107,18 +110,31 @@
 </div>
 <div class="box-main">
     <form class="box-login" action="admin/login" method="post">
-        <c:if test="${shiroLoginFailure != null }">
-            <div style="position:relative;top:-28px; color: #EC1A37;font-size: 20px;">${"org.apache.shiro.authc.UnknownAccountException" == shiroLoginFailure ? "用户不存在!" :"用户密码错误!"}</div>
-        </c:if>
+        <c:choose>
+            <c:when test="${isCheckCodeRight == false}">
+                <div style="position:relative;top:-28px; color: #EC1A37;font-size: 20px;">验证码错误，请重新输入！</div>
+            </c:when>
+            <c:otherwise>
+                <c:if test="${shiroLoginFailure != null }">
+                    <div style="position:relative;top:-28px; color: #EC1A37;font-size: 20px;">${"org.apache.shiro.authc.UnknownAccountException" == shiroLoginFailure ? "用户不存在!" :"密码错误!"}</div>
+                </c:if>
+            </c:otherwise>
+        </c:choose>
         <div style="background-color: #3c4c5f;">
-            <div class="text-box  username">
+            <div class="text-box username">
                 <i class="icon"></i>
                 <input type="text" name="username" placeholder="登录账户名" autofocus="true" >
                 <div class="underline"></div>
             </div>
-            <div class="text-box  password">
+            <div class="text-box password">
                 <i class="icon"></i>
                 <input type="password" name="password" placeholder="账户密码">
+                <div class="underline"></div>
+            </div>
+            <div class="text-box checkcode">
+                <i class="icon"></i>
+                <input type="text" name="checkCode" placeholder="验证码" style="width:168px;">
+                <img id="check_code_img" src="admin/getCheckCodeImage" title="点击刷新图片" style="float:right;"/>
                 <div class="underline"></div>
             </div>
             <div class="text-box remember-me">
@@ -143,6 +159,11 @@
 <script type="text/javascript" src="assets/library/jquery/jquery.sha256.min.js"></script>
 <script type="text/javascript">
     $(function(){
+//        $('#check_code_img').attr('src', 'admin/getCheckCodeImage?' + new Date());
+        $('#check_code_img').unbind('click');
+        $('#check_code_img').bind('click', function() {
+            $('#check_code_img').attr('src', 'admin/getCheckCodeImage?' + new Date());
+        });
         var $btnRem=$(".remember-me");
         $btnRem.on("click","a",function(){
             var $rememberMe=$btnRem.find("input[type=hidden]");

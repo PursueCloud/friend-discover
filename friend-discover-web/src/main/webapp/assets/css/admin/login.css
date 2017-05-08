@@ -32,14 +32,15 @@ html,body{
 }
 .box-main .box-login{margin: auto; width: 295px;}
 .icon{display: inline-block; width: 32px;height: 32px; background-image: url(../../images/admin/login.png);background-repeat: no-repeat;background-position: -6px -6px;}
-.text-box .icon{float: left;}
-.text-box{margin-bottom: 20px;height: 35px;}
-.text-box input{border:none;padding: 0;margin: 0;width: 250px;font-size: 14px;color: #fff; height: 25px;outline:none;background: rgba(0, 0, 0,0);}
+.text-box .icon{float: left;margin:4px 0 0 2px;}
+.text-box{padding-top:6px;margin-bottom: 0px;height: 35px;}
+.text-box input{border:none;padding: 0;margin: 0;width: 248px;font-size: 14px;color: #fff; height: 25px;outline:none;background: rgba(0, 0, 0,0);}
 .text-box input:-webkit-autofill { box-shadow: 0 0 0 1000px #3c4c5f inset;}
 .text-box input{margin: 9px 0 0 13px;}
 .text-box input::-webkit-input-placeholder{color:#5e83ac !important;}
 .text-box input:-moz-placeholder{color:#5e83ac !important;}
 .text-box input:-ms-input-placeholder{color:#5e83ac !important;}
+.text-box.checkcode .icon{background:url(../../images/image.png)}
 .text-box.password .icon{background-position: -38px -6px;}
 .text-box.remember-me .icon{background-position: -70px -6px;}
 .remember-me .icon.checked{background-position: -102px -6px;}

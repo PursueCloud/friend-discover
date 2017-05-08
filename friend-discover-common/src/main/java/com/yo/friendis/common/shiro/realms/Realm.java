@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.yo.friendis.common.admin.model.AdminUser;
 import com.yo.friendis.common.admin.service.AdminUserService;
+import com.yo.friendis.common.shiro.token.UsernamePasswordCheckCodeToken;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -33,7 +35,7 @@ public class Realm extends AuthorizingRealm {
 		setName(getClass().getName());
 	}
 
-	/*
+	/**
 	 * @see org.apache.shiro.realm.AuthorizingRealm#doGetAuthorizationInfo(org.apache.shiro.subject.PrincipalCollection) 获取用户的所有角色、所有的permission return 权限信息
 	 */
 	@Override
@@ -54,7 +56,15 @@ public class Realm extends AuthorizingRealm {
 
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
-		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
+		UsernamePasswordCheckCodeToken token = (UsernamePasswordCheckCodeToken) authcToken;
+		//验证码判断
+		String checkCode = token.getCheckCode();
+		String exitCode = (String) SecurityUtils.getSubject().getSession().getAttribute("SESSIONCODE");
+		if(checkCode==null || !checkCode.equalsIgnoreCase(exitCode)) {
+			SecurityUtils.getSubject().getSession().setAttribute("isCheckCodeRight", false);
+			throw new AuthenticationException("验证码错误！");
+		}
+		SecurityUtils.getSubject().getSession().setAttribute("isCheckCodeRight", true);
 		AdminUser user = adminUserService.getUserByAccount(token.getUsername());
 		if (user != null) {
 			return new SimpleAuthenticationInfo(user, user.getPassword(), getName());

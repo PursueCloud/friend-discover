@@ -192,39 +192,43 @@ public class HadoopController extends BaseController{
      */
     @RequestMapping("uploadFile2HDFS")
     @ResponseBody
-    public Object uploadFile2HDFS(List<CommonsMultipartFile> uploadFile, boolean isUploadDir, String uploadHdfsPath){
+    public Object uploadFile2HDFS(@RequestParam(required=false)List<CommonsMultipartFile> uploadFile, boolean isUploadDir, String uploadHdfsPath){
+        //存在bug：有时重启tomcat时会出现cannot instanint bean specific class即无法初始化实例的错误，原因：具体原因未知，可能与MultipartFile类型有关，参数不能问CommonsMultipartFile
         boolean success = false;
         String msg = "";
 
         try {
             if( uploadFile!=null && !uploadFile.isEmpty() ) {
-                FileSystem fs = FileSystem.get(HadoopUtils.getConf());//连接到hdfs
+                FileSystem fs = HadoopUtils.getFs();//连接到hdfs
                 for(CommonsMultipartFile file : uploadFile) {
+                    String parentPath = uploadHdfsPath;//当前目录上传后所在父hdfs目录
                     String fullPathName = file.getFileItem().getName();
-                    String parentDirName = fullPathName.substring(0, fullPathName.lastIndexOf("/"));
-                    String[] dirArr = parentDirName.split("/");
-                    //判断当前文件所在父目录是否存在，否则新建目录
-                    for(int i=0; i<dirArr.length; i++) {
-                        String currDir = dirArr[i];
-                        String parentDir = "";
-                        if(i > 0) {
-                            for(int j=0; j<i; j++) {//j<j而不是j<=i，因为不包括当前文件路径
-                                parentDir += "/" + dirArr[j];
+                    if(fullPathName.indexOf("/") > 0) {
+                        String parentDirName = fullPathName.substring(0, fullPathName.lastIndexOf("/"));
+                        parentPath += "/" + parentDirName;
+                        String[] dirArr = parentDirName.split("/");
+                        //判断当前文件所在父目录是否存在，否则新建目录
+                        for(int i=0; i<dirArr.length; i++) {
+                            String currDir = dirArr[i];
+                            StringBuilder parentDirBuilder = new StringBuilder();
+                            if(i > 0) {
+                                for(int j=0; j<i; j++) {//j<j而不是j<=i，因为不包括当前文件路径
+                                    parentDirBuilder.append("/").append(dirArr[j]);
+                                }
+                            }
+                            Path currDirPath = new Path(uploadHdfsPath + parentDirBuilder.toString() + "/" + currDir);
+                            boolean existsCurrDir = fs.exists(currDirPath);
+                            if(!existsCurrDir) {
+                                fs.mkdirs(currDirPath);
                             }
                         }
-                        Path currDirPath = new Path(uploadHdfsPath + parentDir + "/" + currDir);
-                        boolean existsCurrDir = fs.exists(currDirPath);
-                        if(!existsCurrDir) {
-                            fs.mkdirs(currDirPath);
-                        }
                     }
-                    String parentPath = uploadHdfsPath + "/" + parentDirName;//父hdfs目录
                     String path = request.getSession().getServletContext().getRealPath("/upload/hadoop");
                     String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
                     String afterUploadFileName = UUID.randomUUID() + suffix;
                     FileUtils.uploadToLoc(file, path, afterUploadFileName);
         //            String uploadFilePath = path + "/" + uploadFile.getOriginalFilename();
-                    Map<String,Object> map = HadoopUtils.upload(path + "/" + afterUploadFileName,
+                    Map<String,Object> map = HadoopUtils.upload(fs, path + "/" + afterUploadFileName,
                             HadoopUtils.getHDFSPath(parentPath + "/" + file.getOriginalFilename()));
                     success = (boolean)map.get("success");
                     msg = map.get("msg").toString();
