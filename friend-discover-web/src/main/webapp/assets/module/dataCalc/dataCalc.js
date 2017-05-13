@@ -112,28 +112,29 @@ define(function(require, exports, module) {
                         },
                         successCallback: function(resp) {//resp已经为json格式
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '距离计算-MR任务启动成功！', 'info');
-                                if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
-                                    //self.$dialog.dialog({
-                                    //    title: '当前MR任务监控',
-                                    //    href: showOneMonitorDataPageUrl,
-                                    //    width: '500px',
-                                    //    height: '500px',
-                                    //    button: [{
-                                    //        text: '退出',
-                                    //        iconCls: 'icon-cancel',
-                                    //        handler: function() {
-                                    //            self.$dialog.dialog('close');
-                                    //        },
-                                    //    }],
-                                    //    modal: true,
-                                    //    queryParams: {},
-                                    //    maximizable: true,
-                                    //    resizable: true,
-                                    //});
-                                    hadoop.openCurrJobMonitor();
-                                    //alert('打开任务监控！')
-                                }
+                                $.messager.alert('温馨提示', '距离计算-MR任务启动成功！', 'info', function() {
+                                    if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
+                                        //self.$dialog.dialog({
+                                        //    title: '当前MR任务监控',
+                                        //    href: showOneMonitorDataPageUrl,
+                                        //    width: '500px',
+                                        //    height: '500px',
+                                        //    button: [{
+                                        //        text: '退出',
+                                        //        iconCls: 'icon-cancel',
+                                        //        handler: function() {
+                                        //            self.$dialog.dialog('close');
+                                        //        },
+                                        //    }],
+                                        //    modal: true,
+                                        //    queryParams: {},
+                                        //    maximizable: true,
+                                        //    resizable: true,
+                                        //});
+                                        hadoop.openCurrJobMonitor();
+                                        //alert('打开任务监控！')
+                                    }
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', '距离计算-MR任务启动失败，原因：' + resp.meta.message, 'warning');
@@ -261,28 +262,29 @@ define(function(require, exports, module) {
                         },
                         successCallback: function(resp) {//resp已经为json格式
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '聚类计算-MR任务启动成功！', 'info');
-                                if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
-                                    //self.$dialog.dialog({
-                                    //    title: '当前MR任务监控',
-                                    //    href: showOneMonitorDataPageUrl,
-                                    //    width: '500px',
-                                    //    height: '500px',
-                                    //    button: [{
-                                    //        text: '退出',
-                                    //        iconCls: 'icon-cancel',
-                                    //        handler: function() {
-                                    //            self.$dialog.dialog('close');
-                                    //        },
-                                    //    }],
-                                    //    modal: true,
-                                    //    queryParams: {},
-                                    //    maximizable: true,
-                                    //    resizable: true,
-                                    //});
-                                    hadoop.openCurrJobMonitor();
-                                    //alert('打开任务监控！')
-                                }
+                                $.messager.alert('温馨提示', '聚类计算-MR任务启动成功！', 'info', function() {
+                                    if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
+                                        //self.$dialog.dialog({
+                                        //    title: '当前MR任务监控',
+                                        //    href: showOneMonitorDataPageUrl,
+                                        //    width: '500px',
+                                        //    height: '500px',
+                                        //    button: [{
+                                        //        text: '退出',
+                                        //        iconCls: 'icon-cancel',
+                                        //        handler: function() {
+                                        //            self.$dialog.dialog('close');
+                                        //        },
+                                        //    }],
+                                        //    modal: true,
+                                        //    queryParams: {},
+                                        //    maximizable: true,
+                                        //    resizable: true,
+                                        //});
+                                        hadoop.openCurrJobMonitor();
+                                        //alert('打开任务监控！')
+                                    }
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', '聚类计算-MR任务启动失败，原因：' + resp.meta.message, 'warning');
@@ -362,28 +364,29 @@ define(function(require, exports, module) {
                         },
                         successCallback: function(resp) {//resp已经为json格式
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '寻找聚类中心-MR任务启动成功！', 'info');
-                                if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
-                                    //self.$dialog.dialog({
-                                    //    title: '当前MR任务监控',
-                                    //    href: showOneMonitorDataPageUrl,
-                                    //    width: '500px',
-                                    //    height: '500px',
-                                    //    button: [{
-                                    //        text: '退出',
-                                    //        iconCls: 'icon-cancel',
-                                    //        handler: function() {
-                                    //            self.$dialog.dialog('close');
-                                    //        },
-                                    //    }],
-                                    //    modal: true,
-                                    //    queryParams: {},
-                                    //    maximizable: true,
-                                    //    resizable: true,
-                                    //});
-                                    hadoop.openCurrJobMonitor();
-                                    //alert('打开任务监控！')
-                                }
+                                $.messager.alert('温馨提示', '寻找聚类中心-MR任务启动成功！', 'info', function() {
+                                    if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
+                                        //self.$dialog.dialog({
+                                        //    title: '当前MR任务监控',
+                                        //    href: showOneMonitorDataPageUrl,
+                                        //    width: '500px',
+                                        //    height: '500px',
+                                        //    button: [{
+                                        //        text: '退出',
+                                        //        iconCls: 'icon-cancel',
+                                        //        handler: function() {
+                                        //            self.$dialog.dialog('close');
+                                        //        },
+                                        //    }],
+                                        //    modal: true,
+                                        //    queryParams: {},
+                                        //    maximizable: true,
+                                        //    resizable: true,
+                                        //});
+                                        hadoop.openCurrJobMonitor();
+                                        //alert('打开任务监控！')
+                                    }
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', '寻找聚类中心-MR任务启动失败，原因：' + resp.meta.message, 'warning');
@@ -614,27 +617,28 @@ define(function(require, exports, module) {
                         },
                         successCallback: function(resp) {//resp已经为json格式
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '执行分类-MR任务启动成功！', 'info');
-                                if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
-                                    //self.$dialog.dialog({
-                                    //    title: '当前MR任务监控',
-                                    //    href: showOneMonitorDataPageUrl,
-                                    //    width: '500px',
-                                    //    height: '500px',
-                                    //    button: [{
-                                    //        text: '退出',
-                                    //        iconCls: 'icon-cancel',
-                                    //        handler: function() {
-                                    //            self.$dialog.dialog('close');
-                                    //        },
-                                    //    }],
-                                    //    modal: true,
-                                    //    queryParams: {},
-                                    //    maximizable: true,
-                                    //    resizable: true,
-                                    //});
-                                    hadoop.openCurrJobMonitor();
-                                }
+                                $.messager.alert('温馨提示', '执行分类-MR任务启动成功！', 'info', function() {
+                                    if( resp.data && resp.data.monitor ) {//打开mr任务监听窗口
+                                        //self.$dialog.dialog({
+                                        //    title: '当前MR任务监控',
+                                        //    href: showOneMonitorDataPageUrl,
+                                        //    width: '500px',
+                                        //    height: '500px',
+                                        //    button: [{
+                                        //        text: '退出',
+                                        //        iconCls: 'icon-cancel',
+                                        //        handler: function() {
+                                        //            self.$dialog.dialog('close');
+                                        //        },
+                                        //    }],
+                                        //    modal: true,
+                                        //    queryParams: {},
+                                        //    maximizable: true,
+                                        //    resizable: true,
+                                        //});
+                                        hadoop.openCurrJobMonitor();
+                                    }
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', '执行分类-MR任务启动失败，原因：' + resp.meta.message, 'warning');

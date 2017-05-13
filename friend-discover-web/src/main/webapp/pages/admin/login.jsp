@@ -15,8 +15,13 @@
         <base href='<%=request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/"%>'>
         <link rel="shortcut icon" href="<%=request.getContextPath()%>/assets/images/favicon.ico">
         <script src="assets/library/jquery/jquery-3.2.0.min.js"></script>
+        <script src="assets/library/easyui/jquery.easyui.min.js"></script>
+        <script src="assets/library/easyui/locale/easyui-lang-zh_CN.js"></script>
         <link rel="stylesheet" type="text/css" href="assets/css/admin/base.css" />
         <link rel="stylesheet" type="text/css" href="assets/css/admin/login.css" />
+        <link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/easyui.css" />
+        <link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/icon.css" />
+        <link rel="stylesheet" type="text/css" href="assets/library/easyui/themes/bootstrap/color.css" />
         <style type="text/css">
             *{font-family: "Microsoft YaHei",Arial,Helvetica,sans-serif; }
             .serial_title{
@@ -185,6 +190,15 @@
             return false;
         });
         $("input[name=password]").keydown(function(e){
+            if(e.keyCode==13){
+                if(!$("input[name=checkCode]").val() || !$("input[name=checkCode]").val().replace(/\s/g, '') ) {
+                    $.messager.alert('温馨提示', '请输入验证码！', 'warning');
+                } else {
+                    $("#login").click();
+                }
+            }
+        });
+        $("input[name=checkCode]").keydown(function(e){
             if(e.keyCode==13){
                 $("#login").click();
             }

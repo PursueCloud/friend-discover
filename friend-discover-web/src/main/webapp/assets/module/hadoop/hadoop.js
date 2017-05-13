@@ -69,8 +69,9 @@ define(function(require, exports, module) {
                             var uploadFileName = '';
 
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '上传文件' + uploadFileName + '到hdfs成功!', 'info');
-                                $('#fs_dialog_win').dialog('close');
+                                $.messager.alert('温馨提示', '上传文件' + uploadFileName + '到hdfs成功!', 'info', function() {
+                                    $('#fs_dialog_win').dialog('close');
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', resp.meta.message, 'error');
@@ -80,8 +81,9 @@ define(function(require, exports, module) {
                             }
                         } else if( self.fileSolveType == '1' ){
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '下载文件：' + self.$form.find('#downloadHdfsFilePath').textbox('getValue') + '成功!', 'info');
-                                $('#fs_dialog_win').dialog('close');
+                                $.messager.alert('温馨提示', '下载文件：' + self.$form.find('#downloadHdfsFilePath').textbox('getValue') + '成功!', 'info', function() {
+                                    $('#fs_dialog_win').dialog('close');
+                                });
                             } else {
                                 if( resp.meta.message ) {
                                     $.messager.alert('温馨提示', resp.meta.message, 'error');
@@ -414,8 +416,9 @@ define(function(require, exports, module) {
                             dataType: 'json',
                             success: function(resp) {
                                 if( resp.meta.success ) {
-                                    $.messager.alert('温馨提示', '删除成功！', 'info');
-                                    self.$hdfsFilesgrid.treegrid('reload');
+                                    $.messager.alert('温馨提示', '删除成功！', 'info', function() {
+                                        self.$hdfsFilesgrid.treegrid('reload');
+                                    });
                                 } else {
                                     if( resp.meta.message ) {
                                         $.messager.alert('温馨提示', resp.meta.message, 'info');
@@ -487,9 +490,10 @@ define(function(require, exports, module) {
                                     resp = JSON.parse(resp);
                                     var cmOpTypeName = self.cmOpType=='0' ? '复制' : '移动';
                                     if( resp.meta.success ) {
-                                        $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info');
-                                        self.$dialog.dialog('close');
-                                        self.$hdfsFilesgrid.treegrid('reload');
+                                        $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info', function() {
+                                            self.$dialog.dialog('close');
+                                            self.$hdfsFilesgrid.treegrid('reload');
+                                        });
                                     } else {
                                         if( resp.meta.message ) {
                                             $.messager.alert('温馨提示', resp.meta.message, 'error');
@@ -544,9 +548,10 @@ define(function(require, exports, module) {
                                     resp = JSON.parse(resp);
                                     var cmOpTypeName = self.cmOpType=='0' ? '复制' : '移动';
                                     if( resp.meta.success ) {
-                                        $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info');
-                                        self.$dialog.dialog('close');
-                                        self.$hdfsFilesgrid.treegrid('reload');
+                                        $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info', function() {
+                                            self.$dialog.dialog('close');
+                                            self.$hdfsFilesgrid.treegrid('reload');
+                                        });
                                     } else {
                                         if( resp.meta.message ) {
                                             $.messager.alert('温馨提示', resp.meta.message, 'error');

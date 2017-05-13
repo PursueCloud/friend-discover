@@ -184,22 +184,16 @@ public class DataKeepController extends BaseController {
                 if( existEmailHashEntryList!=null && !existEmailHashEntryList.isEmpty() ) {//emailHash重复
                     return new OperaterResult<>(false, "该邮箱hash已被使用，请重新输入！");
                 } else {
-                    //displayName去重处理
-                    List<CustomUser> existDisplayNameEntryList = custUserService.selectAllByEqField(CustomUser.FIELD_DISPLAYNAME, custUser.getDisplayName());
-                    if( existDisplayNameEntryList!=null && !existDisplayNameEntryList.isEmpty() ) {//displayName重复
-                        return new OperaterResult<>(false, "该昵称已被使用，请重新输入！");
-                    } else {
-                        if( iconFile!=null && !iconFile.isEmpty() ) {
-                            String path = request.getSession().getServletContext().getRealPath("/upload/custom-user/portraits");
-                            String suffix = iconFile.getOriginalFilename().substring(iconFile.getOriginalFilename().lastIndexOf("."));//文件后缀
-                            String iconFileName = UUID.randomUUID() + suffix;//使用UUID生成唯一标识符
-                            FileUtils.uploadToLoc(iconFile, path, iconFileName);
-                            custUser.setIcon("upload/custom-user/portraits/" + iconFileName);
-                        }
-                        custUser.setUserId("0");
-                        custUser.setCreateDate(DateUtils.getCurrentTimestamp());
-                        success = custUserService.addSelective(custUser) > 0;
+                    if( iconFile!=null && !iconFile.isEmpty() ) {
+                        String path = request.getSession().getServletContext().getRealPath("/upload/custom-user/portraits");
+                        String suffix = iconFile.getOriginalFilename().substring(iconFile.getOriginalFilename().lastIndexOf("."));//文件后缀
+                        String iconFileName = UUID.randomUUID() + suffix;//使用UUID生成唯一标识符
+                        FileUtils.uploadToLoc(iconFile, path, iconFileName);
+                        custUser.setIcon("upload/custom-user/portraits/" + iconFileName);
                     }
+                    custUser.setUserId("0");
+                    custUser.setCreateDate(DateUtils.getCurrentTimestamp());
+                    success = custUserService.addSelective(custUser) > 0;
                 }
             } else if( "1".equals(tableCode) ) {//添加hadoop配置
                 if( StringUtils.isBlank(haCfgConst.getConstKey()) || StringUtils.isBlank(haCfgConst.getConstValue()) ) {//非空判断
@@ -255,22 +249,15 @@ public class DataKeepController extends BaseController {
                         && !existEmailHashEntryList.get(0).getUserId().equals(custUser.getUserId()) ) {//emailHash重复
                     return new OperaterResult<>(false, "该邮箱hash已被使用，请重新输入！");
                 } else {
-                    //displayName去重处理
-                    List<CustomUser> existDisplayNameEntryList = custUserService.selectAllByEqField(CustomUser.FIELD_DISPLAYNAME, custUser.getDisplayName());
-                    if( existDisplayNameEntryList!=null && !existDisplayNameEntryList.isEmpty()
-                            && !custUser.getUserId().equals(existDisplayNameEntryList.get(0).getUserId()) ) {//displayName重复
-                        return new OperaterResult<>(false, "该昵称已被使用，请重新输入！");
-                    } else {
-                        if( iconFile!=null && !iconFile.isEmpty() ) {
-                            String path = request.getSession().getServletContext().getRealPath("/upload/custom-user/portraits");
-                            String suffix = iconFile.getOriginalFilename().substring(iconFile.getOriginalFilename().lastIndexOf("."));//文件后缀
-                            String iconFileName = UUID.randomUUID() + suffix;//使用UUID生成唯一标识符
-                            FileUtils.uploadToLoc(iconFile, path, iconFileName);
-                            custUser.setIcon("upload/custom-user/portraits/" + iconFileName);
-                        }
-                        custUser.setModifyDate(DateUtils.getCurrentTimestamp());
-                        success = custUserService.updateByPrimaryKeySelective(custUser) > 0;
+                    if( iconFile!=null && !iconFile.isEmpty() ) {
+                        String path = request.getSession().getServletContext().getRealPath("/upload/custom-user/portraits");
+                        String suffix = iconFile.getOriginalFilename().substring(iconFile.getOriginalFilename().lastIndexOf("."));//文件后缀
+                        String iconFileName = UUID.randomUUID() + suffix;//使用UUID生成唯一标识符
+                        FileUtils.uploadToLoc(iconFile, path, iconFileName);
+                        custUser.setIcon("upload/custom-user/portraits/" + iconFileName);
                     }
+                    custUser.setModifyDate(DateUtils.getCurrentTimestamp());
+                    success = custUserService.updateByPrimaryKeySelective(custUser) > 0;
                 }
             } else if( "1".equals(tableCode) ) {//修改hadoop配置
                 if( StringUtils.isBlank(haCfgConst.getConstKey()) || StringUtils.isBlank(haCfgConst.getConstValue())

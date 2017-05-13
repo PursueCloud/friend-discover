@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.yo.friendis.common.admin.util.ImageCode;
 import org.apache.shiro.SecurityUtils;
@@ -58,10 +59,15 @@ public class AdminController extends BaseController {
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
+			"".split("");
+			Pattern.compile("").split("");
 			try {
 				sos.close();
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
+				if (int.class == Integer.TYPE) {
+
+				}
 			}
 		}
 	}

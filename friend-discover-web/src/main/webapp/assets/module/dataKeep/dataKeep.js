@@ -26,6 +26,27 @@ define(function(require, exports, module) {
 
     var self;
 
+    function checkIsChooseImgFile(fileInputSelector, paramJson) {//检查当前选中的文件是否为图片文件（png/jpg/jpeg）
+        var fileInputDom = !fileInputSelector ? $('td[field="icon"] input[type="file"]')[0] : $(fileInputSelector)[0];
+        var iconFile = fileInputDom.files[0];//获取上传图片文件
+        if( iconFile ) {
+            var fileSuffix = iconFile.name.substring(iconFile.name.lastIndexOf('.')+1);//获取选中文件后缀
+            if( fileSuffix!='png' && fileSuffix!='jpg' && fileSuffix!='jpeg') {
+                $.messager.alert('温馨提示', '只能选择png/jpg/jpeg格式文件作为头像！', 'warning');
+                fileInputDom.files[0] = undefined;//清空选中的文件
+                if( paramJson && paramJson.fail ) {
+                    console.log('check img failed');
+                    paramJson.fail();
+                }
+                return false;
+            }
+            if( paramJson && paramJson.success ) {
+                console.log('check img success');
+                paramJson.success();
+            }
+        }
+        return true;
+    }
     var defaultUserCols = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];//默认列
     var defaultHadoopCols = [0, 1, 2, 3, 4];//默认hadoop配置列
     //json对象: datagrid columns
@@ -69,13 +90,19 @@ define(function(require, exports, module) {
                 if( !val ) {
                     return '无';
                 }
-                return '<img src="' + val + '" style="margin:auto;width:80px;height:80px;border-radius:10px;border:1px solid #999;vertical-align: middle"/>';
+                if(val.indexOf('fakepath') != -1) {
+                    return '';
+                }
+                return '<img id="formatter_icon_img" src="' + val + '" style="margin:auto;width:80px;height:80px;border-radius:10px;border:1px solid #999;vertical-align: middle"/>';
             },
             editor : {
                 type:'filebox',
                 options: {
                     required:false,
-                }
+                    onChange: function() {
+                        checkIsChooseImgFile();
+                    }
+                },
             }
         },
         '3' : {colId:'3', field: 'emailHash',title: '邮箱hash',width: 100, align:'center',
@@ -283,13 +310,19 @@ define(function(require, exports, module) {
                 if( !val ) {
                     return '无';
                 }
-                return '<img src="' + val + '" style="margin:auto;width:80px;height:80px;border-radius:10px;border:1px solid #999;vertical-align: middle"/>';
+                if(val.indexOf('fakepath') != -1) {
+                    return '';
+                }
+                return '<img id="formatter_icon_img" src="' + val + '" style="margin:auto;width:80px;height:80px;border-radius:10px;border:1px solid #999;vertical-align: middle"/>';
             },
             editor : {
                 type:'filebox',
                 options: {
                     required:false,
-                }
+                    onChange: function() {
+                        checkIsChooseImgFile();
+                    }
+                },
             }
         },
         {field: 'emailHash', title: '邮箱hash', width: '100', align:'center',
@@ -473,7 +506,7 @@ define(function(require, exports, module) {
                 self.$form.form('submit', {
                     onSubmit: function() {
                         if( self.$form.form('validate') ) {
-                            return true;
+                            return checkIsChooseImgFile(self.$form.find('input[name="iconFile"]'));
                         } else {
                             $.messager.alert('温馨提示', '必输项不能为空！', 'warning');
                             return false;
@@ -483,9 +516,10 @@ define(function(require, exports, module) {
                         resp = JSON.parse(resp);
                         var opName = self.opType=='add' ? '新增' : '修改';
                         if( resp.meta.success ) {
-                            $.messager.alert('温馨提示', opName + '成功', 'info');
-                            self.$dialog.dialog('close');
-                            self.$tablegrid.datagrid('reload');
+                            $.messager.alert('温馨提示', opName + '成功', 'info', function() {
+                                self.$dialog.dialog('close');
+                                self.$tablegrid.datagrid('reload');
+                            });
                         } else {
                             if( resp.meta.message ) {
                                 $.messager.alert('温馨提示', resp.meta.message, 'info');
@@ -704,6 +738,11 @@ define(function(require, exports, module) {
                             $(this).datagrid('cancelEdit', self.lastEditIndex);
                             self.lastEditIndex = index;
                             $(this).datagrid('beginEdit', index);
+                        } else {
+                            var selected = self.$tablegrid.datagrid('getSelected');
+                            var currIndex = self.$tablegrid.datagrid('getRowIndex', selected);
+                            self.lastEditIndex = currIndex;
+                            self.$tablegrid.datagrid('beginEdit', currIndex);
                         }
                     } else {
                         self.openEditDialog(true);
@@ -715,6 +754,11 @@ define(function(require, exports, module) {
                             $(this).datagrid('cancelEdit', self.lastEditIndex);
                             self.lastEditIndex = index;
                             $(this).datagrid('beginEdit', index);
+                        } else {
+                            var selected = self.$tablegrid.datagrid('getSelected');
+                            var currIndex = self.$tablegrid.datagrid('getRowIndex', selected);
+                            self.lastEditIndex = currIndex;
+                            self.$tablegrid.datagrid('beginEdit', currIndex);
                         }
                     } else {
                         self.openEditDialog(true);
@@ -723,24 +767,34 @@ define(function(require, exports, module) {
                 onEndEdit: function(index,row,changes) {
                     var tableCode = $('#keepData_table_select').combobox('getValue');
                     var dataName = tableCode=='0' ? '用户属性数据' : 'hadoop配置数据';
-                    var params = {
-                        tableCode: tableCode,
-                    };
+                    var form = new FormData();
+                    var iconFile = $('td[field="icon"] input[type="file"]')[0].files[0];//获取上传图片文件
+                    if( iconFile ) {
+                        if(!checkIsChooseImgFile()) {
+                            return;
+                        }
+                        form.append('iconFile', iconFile);
+                    }
+                    form.append('tableCode', tableCode);
                     if( row ) {
                         for(var i in row) {
-                            params[i] = row[i];
+                            if(i!='createDate' && i!='modifyDate' && i!='lastAccessDate') {
+                                form.append(i, row[i]);
+                            }
                         }
                     }
                     var reqUrl = addDataRequestUrl;
                     var opName = '新增';
-                    if( (params.userId||params.constId) && self.opType=='edit' ) {//编辑
+                    if( (form.get('userId')||form.get('constId')) && self.opType=='edit' ) {//编辑
                         opName = '修改';
                         reqUrl = editDataRequestUrl;
                     }
                     $.ajax({
                         type: 'post',
                         url: reqUrl,
-                        data: params,
+                        data: form,
+                        contentType: false,
+                        processData: false,
                         dataType: 'json',
                         success: function(resp) {
                             if( resp.meta.success ) {
@@ -912,8 +966,9 @@ define(function(require, exports, module) {
                         $.post(delDataRequestUrl, param, function(resp) {
                             resp = JSON.parse(resp);
                             if( resp.meta.success ) {
-                                $.messager.alert('温馨提示', '删除成功!', 'info');
-                                self.$tablegrid.datagrid('reload');
+                                $.messager.alert('温馨提示', '删除成功!', 'info', function() {
+                                    self.$tablegrid.datagrid('reload');
+                                });
                             } else {
                                 $.messager.alert('温馨提示', '删除失败!', 'info');
                             }
@@ -978,6 +1033,7 @@ define(function(require, exports, module) {
                 //alert('撤销');
                 if( self.openRowEditPattern && (self.lastEditIndex || self.lastEditIndex==0) ) {
                     self.$tablegrid.datagrid('cancelEdit', self.lastEditIndex);
+                    self.$tablegrid.datagrid('rejectChanges', self.lastEditIndex);
                 } else {
                     console.log('当前处于非行编辑模式或当前无新增或编辑行');
                 }
@@ -1011,9 +1067,10 @@ define(function(require, exports, module) {
                                     resp = JSON.parse(resp);
                                     var tableName = tableCode=='0' ? '用户属性' : 'hadoop配置';
                                     if( resp.meta.success ) {
-                                        $.messager.alert('温馨提示', '导入' + tableName + '数据成功', 'info');
-                                        self.$dialog.dialog('close');
-                                        self.$tablegrid.datagrid('reload');
+                                        $.messager.alert('温馨提示', '导入' + tableName + '数据成功', 'info', function() {
+                                            self.$dialog.dialog('close');
+                                            self.$tablegrid.datagrid('reload');
+                                        });
                                     } else {
                                         if( resp.meta.message ) {
                                             $.messager.alert('温馨提示', resp.meta.message, 'info');
@@ -1288,7 +1345,14 @@ define(function(require, exports, module) {
             self.$form.find('#icon').filebox({
                 onChange: function(newVal) {
                     //self.$form.find('#icon_preview_img').attr('src', newVal);
-                    utils.previewImg('#icon_preview_img', 'input[name="iconFile"]');
+                    checkIsChooseImgFile(self.$form.find('input[name="iconFile"]'), {
+                        success: function() {
+                            utils.previewImg('#icon_preview_img', 'input[name="iconFile"]');
+                        },
+                        fail: function() {
+                            $('#icon_preview_img').attr('src', '');
+                        }
+                    });
                 }
             });
         },

@@ -395,7 +395,19 @@ define(function(require, exports, module) {
 			preview.src = "";
 		}
 	};
-
+	Utils.previewImgOverride1  = function(imgToShowSelector, fileInputElem) {
+		var preview = document.querySelector(imgToShowSelector);
+		var file  = fileInputElem[0].files[0];
+		var reader = new FileReader();
+		reader.onloadend = function () {
+			preview.src = reader.result;
+		}
+		if(file) {
+			reader.readAsDataURL(file);
+		} else {
+			preview.src = "";
+		}
+	};
 	/**
 	 * 判断鼠标是否在指定选择器的元素边界内
 	 * @param selector

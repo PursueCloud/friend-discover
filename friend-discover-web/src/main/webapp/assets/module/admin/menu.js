@@ -122,9 +122,10 @@ define(function(require, exports, module) {
 					$.get('admin/menu/clearMenuCache', null, function(resp) {
 						resp = JSON.parse(resp);
 						if( resp.meta.success ) {
-							$.messager.alert('温馨提示', '菜单缓存清除完毕，请刷新页面！', 'info');
+							$.messager.alert('温馨提示', '菜单缓存清除完毕，请刷新页面！', 'info', function() {
+								self.$grid.treegrid('loaded');
+							});
 						}
-						self.$grid.treegrid('loaded');
 					});
 				}
 			}];

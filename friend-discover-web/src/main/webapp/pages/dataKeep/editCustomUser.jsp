@@ -33,6 +33,7 @@
                 </tr>
                 <tr>
                     <td>个人主页：</td>
+
                     <td colspan="3" style="text-align:left;">
                         <input id="website_url" name="websiteUrl" class="easyui-textbox" style="width:465px;" data-options="prompt:'请输入个人主页url', validType:'url',"/>
                     </td>
