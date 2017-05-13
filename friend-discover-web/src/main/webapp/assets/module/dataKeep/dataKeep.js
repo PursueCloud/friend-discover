@@ -26,6 +26,38 @@ define(function(require, exports, module) {
 
     var self;
 
+    function validInput(callback) {
+        var tableCode = $('#keepData_table_select').combobox('getValue');
+        if( tableCode == '0' ) {
+            var displayNameEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'displayName'});
+            var emailHashEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'emailHash'});
+            var inputDisplayName = $(displayNameEd.target).textbox('getValue');
+            var inputEmailHash = $(emailHashEd.target).textbox('getValue');
+            if( !inputDisplayName || (inputDisplayName && !inputDisplayName.replace(/\s/g, '')) ) {
+                $.messager.alert('温馨提示', '昵称不能为空!', 'warning');
+            } else if( !inputEmailHash || (inputEmailHash && !inputEmailHash.replace(/\s/g, '')) ) {
+                $.messager.alert('温馨提示', '邮箱hash不能为空!', 'warning');
+            } else {
+                if(callback) {
+                    callback();
+                }
+            }
+        } else {
+            var constKeyEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'constKey'});
+            var constValueEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'constValue'});
+            var inputConstKey = $(constKeyEd.target).textbox('getValue');
+            var inputConstValue = $(constValueEd.target).textbox('getValue');
+            if( !inputConstKey || (inputConstKey && !inputConstKey.replace(/\s/g, '')) ) {
+                $.messager.alert('温馨提示', '配置项名不能为空!', 'warning');
+            } else if( !inputConstValue || (inputConstValue && !inputConstValue.replace(/\s/g, '')) ) {
+                $.messager.alert('温馨提示', '配置项值不能为空!', 'warning');
+            } else {
+                if(callback) {
+                    callback();
+                }
+            }
+        }
+    }
     function checkIsChooseImgFile(fileInputSelector, paramJson) {//检查当前选中的文件是否为图片文件（png/jpg/jpeg）
         var fileInputDom = !fileInputSelector ? $('td[field="icon"] input[type="file"]')[0] : $(fileInputSelector)[0];
         var iconFile = fileInputDom.files[0];//获取上传图片文件
@@ -734,6 +766,7 @@ define(function(require, exports, module) {
                 },
                 onDblClickCell: function(index, field, value) {
                     if( self.openRowEditPattern ) {
+                        self.rowEditType = 'edit';
                         if( index != self.lastEditIndex ) {
                             $(this).datagrid('cancelEdit', self.lastEditIndex);
                             self.lastEditIndex = index;
@@ -750,6 +783,7 @@ define(function(require, exports, module) {
                 },
                 onDblClickRow: function(index, row) {
                     if( self.openRowEditPattern ) {
+                        self.rowEditType = 'edit';
                         if( index != self.lastEditIndex ) {
                             $(this).datagrid('cancelEdit', self.lastEditIndex);
                             self.lastEditIndex = index;
@@ -799,11 +833,11 @@ define(function(require, exports, module) {
                         success: function(resp) {
                             if( resp.meta.success ) {
                                 console.log(opName + dataName + '成功');
-                                self.$tablegrid.datagrid('acceptChanges', self.lastEditIndex);
+                                self.$tablegrid.datagrid('acceptChanges');
                                 self.$tablegrid.datagrid('reload');
                             } else {
                                 self.$tablegrid.datagrid('cancelEdit', self.lastEditIndex);//回滚
-                                self.$tablegrid.datagrid('rejectChanges', self.lastEditIndex);
+                                self.$tablegrid.datagrid('rejectChanges');
                             }
                             self.lastEditIndex = undefined;
                         }
@@ -910,6 +944,7 @@ define(function(require, exports, module) {
             self.$toolbar.find('a#add_a').unbind('click');
             self.$toolbar.find('a#add_a').bind('click', function() {
                 if( self.openRowEditPattern ) {//行编辑模式
+                    self.rowEditType = 'add';
                     self.$tablegrid.datagrid('insertRow',{
                         index: 0,	// 新增到第一行
                         row: {}
@@ -926,10 +961,12 @@ define(function(require, exports, module) {
                 if( self.openRowEditPattern ) {//行编辑模式
                     var selected = self.$tablegrid.datagrid('getSelected');
                     if( selected ) {
+                        self.rowEditType = 'edit';
                         var currIndex = self.$tablegrid.datagrid('getRowIndex', selected);
                         self.lastEditIndex = currIndex;
                         self.$tablegrid.datagrid('beginEdit', currIndex);
                     } else {
+                        self.rowEditType = '';
                         $.messager.alert('温馨提示', '请先选择行！', 'warning');
                     }
                 } else {//非行编辑模式
@@ -987,42 +1024,40 @@ define(function(require, exports, module) {
                     self.$toolbar.find('span#edit_pattern_state').text('关闭');
                     self.openRowEditPattern = true;
                 } else {
-                    self.openRowEditPattern = false;
-                    self.$toolbar.find('a#save_a').linkbutton({disabled: true});
-                    self.$toolbar.find('a#undo_a').linkbutton({disabled: true});
-                    self.$toolbar.find('span#edit_pattern_state').text('开启');
+                    self.$toolbar.find('#row_edit_pattern_check').prop('checked', true);
+                    if(self.lastEditIndex || self.lastEditIndex==0) {
+                        var msg = (self.rowEditType=='add' ? '新增' : '编辑' ) + '行数据未保存，是否先保存再退出行编辑模式？'
+                        $.messager.confirm('温馨提示', msg, function(r) {
+                            if(r) {
+                                validInput(function() {
+                                    exitRowEditPattern();
+                                    self.$tablegrid.datagrid('endEdit', self.lastEditIndex);
+                                });
+                            } else {
+                                self.$tablegrid.datagrid('cancelEdit', self.lastEditIndex);
+                                self.$tablegrid.datagrid('rejectChanges');
+                                exitRowEditPattern();
+                            }
+                        })
+                    } else {
+                        exitRowEditPattern();
+                    }
+                    function exitRowEditPattern() {
+                        self.$toolbar.find('#row_edit_pattern_check').prop('checked', false);
+                        self.openRowEditPattern = false;
+                        self.$toolbar.find('a#save_a').linkbutton({disabled: true});
+                        self.$toolbar.find('a#undo_a').linkbutton({disabled: true});
+                        self.$toolbar.find('span#edit_pattern_state').text('开启');
+                    }
                 }
             });
             self.$toolbar.find('a#save_a').unbind('click');
             self.$toolbar.find('a#save_a').bind('click', function() {
                 //alert('保存');
                 if( self.openRowEditPattern && (self.lastEditIndex || self.lastEditIndex==0) ) {
-                    var tableCode = $('#keepData_table_select').combobox('getValue');
-                    if( tableCode == '0' ) {
-                        var displayNameEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'displayName'});
-                        var emailHashEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'emailHash'});
-                        var inputDisplayName = $(displayNameEd.target).textbox('getValue');
-                        var inputEmailHash = $(emailHashEd.target).textbox('getValue');
-                        if( !inputDisplayName || (inputDisplayName && !inputDisplayName.replace(/\s/g, '')) ) {
-                            $.messager.alert('温馨提示', '昵称不能为空!', 'warning');
-                        } else if( !inputEmailHash || (inputEmailHash && !inputEmailHash.replace(/\s/g, '')) ) {
-                            $.messager.alert('温馨提示', '邮箱hash不能为空!', 'warning');
-                        } else {
-                            self.$tablegrid.datagrid('endEdit', self.lastEditIndex);
-                        }
-                    } else {
-                        var constKeyEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'constKey'});
-                        var constValueEd = self.$tablegrid.datagrid('getEditor', {index:self.lastEditIndex,field:'constValue'});
-                        var inputConstKey = $(constKeyEd.target).textbox('getValue');
-                        var inputConstValue = $(constValueEd.target).textbox('getValue');
-                        if( !inputConstKey || (inputConstKey && !inputConstKey.replace(/\s/g, '')) ) {
-                            $.messager.alert('温馨提示', '配置项名不能为空!', 'warning');
-                        } else if( !inputConstValue || (inputConstValue && !inputConstValue.replace(/\s/g, '')) ) {
-                            $.messager.alert('温馨提示', '配置项值不能为空!', 'warning');
-                        } else {
-                            self.$tablegrid.datagrid('endEdit', self.lastEditIndex);
-                        }
-                    }
+                    validInput(function() {
+                        self.$tablegrid.datagrid('endEdit', self.lastEditIndex);
+                    });
                 } else {
                     console.log('当前处于非行编辑模式或当前无新增或编辑行');
                 }
@@ -1033,7 +1068,7 @@ define(function(require, exports, module) {
                 //alert('撤销');
                 if( self.openRowEditPattern && (self.lastEditIndex || self.lastEditIndex==0) ) {
                     self.$tablegrid.datagrid('cancelEdit', self.lastEditIndex);
-                    self.$tablegrid.datagrid('rejectChanges', self.lastEditIndex);
+                    self.$tablegrid.datagrid('rejectChanges');
                 } else {
                     console.log('当前处于非行编辑模式或当前无新增或编辑行');
                 }

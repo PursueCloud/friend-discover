@@ -558,9 +558,11 @@ public class HadoopController extends BaseController{
                         String sort = page.getSort();
                         String order = page.getOrder();
                         if( "asc".equals(order) ) {
-                            dirsList.sort((Map<String, Object> m1, Map<String, Object> m2)->m1.get(sort).toString().compareTo(m2.get(sort).toString()));
+                            dirsList.sort((Map<String, Object> m1, Map<String, Object> m2)
+                                    ->m1.get(sort).toString().compareTo(m2.get(sort).toString()));
                         } else {
-                            dirsList.sort((Map<String, Object> m1, Map<String, Object> m2)->m2.get(sort).toString().compareTo(m1.get(sort).toString()));
+                            dirsList.sort((Map<String, Object> m1, Map<String, Object> m2)
+                                    ->m2.get(sort).toString().compareTo(m1.get(sort).toString()));
                         }
                     }
                 }
@@ -590,7 +592,7 @@ public class HadoopController extends BaseController{
                     dirMap.put("fileName", fileName);
                     dirMap.put("rootPath", rootPath);
                     dirMap.put("modifyTime", DateUtils.formatTime(new Date(file.getModificationTime())));
-                    dirMap.put("fileSize", FileUtils.getFormatFileSize(file.getLen()));
+                    dirMap.put("fileSize", FileUtils.getFormatFileSize(getFileSize(fs, file)));
                     dirMap.put("parentId", rootId);
                     dirMap.put("isFolder", file.isDirectory());
                     FileStatus[] childChilds = fs.listStatus(file.getPath());
@@ -630,7 +632,7 @@ public class HadoopController extends BaseController{
                 dirMap.put("fileName", fileName);
                 dirMap.put("rootPath", rootPath);
                 dirMap.put("modifyTime", DateUtils.formatTime(new Date(file.getModificationTime())));
-                dirMap.put("fileSize", FileUtils.getFormatFileSize(file.getLen()));
+                dirMap.put("fileSize", FileUtils.getFormatFileSize(getFileSize(fs, file)));
                 dirMap.put("parentId", rootId);
                 dirMap.put("isFolder", file.isDirectory());
                 if( file.isDirectory() ) {//当当前file为目录时才寻找子文件和目录
@@ -671,7 +673,7 @@ public class HadoopController extends BaseController{
                 dirMap.put("fileName", fileName);
                 dirMap.put("rootPath", rootPath);
                 dirMap.put("modifyTime", DateUtils.formatTime(new Date(file.getModificationTime())));
-                dirMap.put("fileSize", FileUtils.getFormatFileSize(file.getLen()));
+                dirMap.put("fileSize", FileUtils.getFormatFileSize(getFileSize(fs, file)));
                 dirMap.put("parentId", rootId);
                 dirMap.put("isFolder", file.isDirectory());
                 if( file.isDirectory() ) {//当当前file为目录时才寻找子文件和目录
@@ -722,7 +724,7 @@ public class HadoopController extends BaseController{
                 dirMap.put("fileName", fileName);
                 dirMap.put("rootPath", rootPath);
                 dirMap.put("modifyTime", DateUtils.formatTime(new Date(file.getModificationTime())));
-                dirMap.put("fileSize", FileUtils.getFormatFileSize(file.getLen()));
+                dirMap.put("fileSize", FileUtils.getFormatFileSize(getFileSize(fs, file)));
                 dirMap.put("parentId", rootId);
                 dirMap.put("isFolder", file.isDirectory());
                 files.add(dirMap);
@@ -749,5 +751,21 @@ public class HadoopController extends BaseController{
             }
         }
         return rootChildren;
+    }
+
+    private long getFileSize(FileSystem fs, FileStatus file) throws IOException {
+        long allFilesSize = 0L;
+        if(file.isDirectory()) {
+            FileStatus[] subFiles = fs.listStatus(file.getPath());
+            if(subFiles!=null && subFiles.length>0) {
+                for(FileStatus subFile : subFiles) {
+                    long subSubFilesSizes = getFileSize(fs, subFile);
+                    allFilesSize += subSubFilesSizes;
+                }
+            }
+        } else {
+            allFilesSize = file.getLen();
+        }
+        return allFilesSize;
     }
 }

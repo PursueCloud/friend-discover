@@ -70,7 +70,8 @@ define(function(require, exports, module) {
 
                             if( resp.meta.success ) {
                                 $.messager.alert('温馨提示', '上传文件' + uploadFileName + '到hdfs成功!', 'info', function() {
-                                    $('#fs_dialog_win').dialog('close');
+                                    //$('#fs_dialog_win').dialog('close');
+                                    $('#hadoop_dialog_win').dialog('close');
                                 });
                             } else {
                                 if( resp.meta.message ) {
@@ -82,7 +83,8 @@ define(function(require, exports, module) {
                         } else if( self.fileSolveType == '1' ){
                             if( resp.meta.success ) {
                                 $.messager.alert('温馨提示', '下载文件：' + self.$form.find('#downloadHdfsFilePath').textbox('getValue') + '成功!', 'info', function() {
-                                    $('#fs_dialog_win').dialog('close');
+                                    //$('#fs_dialog_win').dialog('close');
+                                    $('#hadoop_dialog_win').dialog('close');
                                 });
                             } else {
                                 if( resp.meta.message ) {
@@ -243,6 +245,8 @@ define(function(require, exports, module) {
                                 return;
                             }
                         }
+                        $(this).treegrid('unselectAll');
+                        $(this).treegrid('selectRow', self.hdfsBrowser_lastRow);
                         var path = self.getCurrSelectedFilePathInHDFS($(this));
                         //console.log('path:');
                         //console.log(path);
@@ -270,10 +274,12 @@ define(function(require, exports, module) {
                             data: params,
                             dataType: 'json',
                             success: function(resp) {
+                                self.hdfsBrowser_lastRow = undefined;
                                 if( resp.meta.success ) {
                                     row.hasSave = true;
                                     self.$hdfsFilesgrid.treegrid('acceptChanges');
                                     self.$hdfsFilesgrid.treegrid('reload');
+                                    self.$hdfsFilesgrid.treegrid('unselectAll');
                                 } else {
                                     self.$hdfsFilesgrid.treegrid('rejectChanges');
                                     if( self.mkdir ) {
@@ -291,8 +297,27 @@ define(function(require, exports, module) {
                     }
                 },
                 onClickCell: function(field, row) {
-                    if( self.hdfsBrowser_lastField!=field || self.hdsfBrowser_lastRow!=row.fileId ) {
-                        self.$hdfsFilesgrid.treegrid('cancelEdit', self.hdsfBrowser_lastRow);
+                    if( self.hdfsBrowser_lastField!=field || self.hdfsBrowser_lastRow!=row.fileId ) {
+                        if(self.hdfsBrowser_lastRow || self.hdfsBrowser_lastRow==0 ) {
+                            var msg = self.editType=='mkdir' ? '新增的文件夹尚未保存，是否先保存？' : '修改的文件名尚未保存，是否先保存?';
+                            $.messager.confirm('温馨提示', msg, function(r) {
+                                if(r) {
+                                    self.isSave = true;
+                                    self.$hdfsFilesgrid.treegrid('endEdit', self.hdfsBrowser_lastRow);
+                                    $('span#mkdir_op_span').hide();
+                                    self.editType = '';
+                                } else {
+                                    self.isSave = false;
+                                    if( self.mkdir ) {
+                                        self.$hdfsFilesgrid.treegrid('remove', self.hdfsBrowser_lastRow);
+                                    }
+                                    self.$hdfsFilesgrid.treegrid('cancelEdit', self.hdfsBrowser_lastRow);
+                                    $('span#mkdir_op_span').hide();
+                                    self.editType = '';
+                                    self.hdfsBrowser_lastRow = undefined;
+                                }
+                            })
+                        }
                     }
                 },
                 onDblClickCell: function(field, row) {
@@ -300,11 +325,12 @@ define(function(require, exports, module) {
                         $.messager.alert('温馨提示', '根目录无法重命名！', 'warning');
                         return;
                     }
+                    self.editType = 'rename';
                     self.mkdir = false;
                     self.hdfsBrowser_lastField = field;
-                    self.hdsfBrowser_lastRow = row.fileId;
+                    self.hdfsBrowser_lastRow = row.fileId;
                     self.$hdfsBrowser_orginalFilePath = row.rootPath + row.fileName;
-                    self.$hdfsFilesgrid.treegrid('beginEdit', self.hdsfBrowser_lastRow);
+                    self.$hdfsFilesgrid.treegrid('beginEdit', self.hdfsBrowser_lastRow);
                     $('span#mkdir_op_span').show();
                 },
                 ctrlSelect: true,
@@ -335,29 +361,33 @@ define(function(require, exports, module) {
             $('li#upload_folder_to_hdfs_li').bind('click', function(e) {
                 console.log('上传文件夹');
                 self.isUploadDir = true;
-                self.openChooseFileOrEnterPathDialog(self.$dialog, null, '350px', '0');
+                self.openChooseFileOrEnterPathDialog(self.$dialog, '上传文件夹', '350px', '0');
             });
             $('a#mkdir_in_hdfs_a').unbind('click');
             $('a#mkdir_in_hdfs_a').bind('click', function(e) {
                 //console.log('新建文件夹');
+                self.editType = 'mkdir';
                 self.createNewDirInHdfs(self.$hdfsFilesgrid);
             });
             $('a#save_a').unbind('click');
             $('a#save_a').bind('click', function(e) {
                 console.log('保存');
                 self.isSave = true;
-                self.$hdfsFilesgrid.treegrid('endEdit', self.hdsfBrowser_lastRow);
+                self.$hdfsFilesgrid.treegrid('endEdit', self.hdfsBrowser_lastRow);
                 $('span#mkdir_op_span').hide();
+                self.editType = '';
             });
             $('a#cancel_a').unbind('click');
             $('a#cancel_a').bind('click', function(e) {
                 console.log('取消');
                 self.isSave = false;
                 if( self.mkdir ) {
-                    self.$hdfsFilesgrid.treegrid('remove', self.hdsfBrowser_lastRow);
+                    self.$hdfsFilesgrid.treegrid('remove', self.hdfsBrowser_lastRow);
                 }
-                self.$hdfsFilesgrid.treegrid('cancelEdit', self.hdsfBrowser_lastRow);
+                self.$hdfsFilesgrid.treegrid('cancelEdit', self.hdfsBrowser_lastRow);
                 $('span#mkdir_op_span').hide();
+                self.editType = '';
+                self.hdfsBrowser_lastRow = undefined;
             });
             $('a#download_file_from_hdfs_a').unbind('click');
             $('a#download_file_from_hdfs_a').bind('click', function(e) {
@@ -418,6 +448,7 @@ define(function(require, exports, module) {
                                 if( resp.meta.success ) {
                                     $.messager.alert('温馨提示', '删除成功！', 'info', function() {
                                         self.$hdfsFilesgrid.treegrid('reload');
+                                        self.$hdfsFilesgrid.treegrid('unselectAll');
                                     });
                                 } else {
                                     if( resp.meta.message ) {
@@ -434,6 +465,7 @@ define(function(require, exports, module) {
             $('a#reload_files_a').unbind('click');
             $('a#reload_files_a').bind('click', function(e) {
                 self.$hdfsFilesgrid.treegrid('reload');
+                self.$hdfsFilesgrid.treegrid('unselectAll');
             });
             $('li#rename_file_li').unbind('click');
             $('li#rename_file_li').bind('click', function(e) {
@@ -447,11 +479,12 @@ define(function(require, exports, module) {
                     $.messager.alert('温馨提示', '根目录无法重命名！', 'warning');
                     return;
                 }
+                self.editType = 'rename';
                 self.mkdir = false;
                 self.hdfsBrowser_lastField = "fileName";
-                self.hdsfBrowser_lastRow = selected.fileId;
+                self.hdfsBrowser_lastRow = selected.fileId;
                 self.$hdfsBrowser_orginalFilePath = selected.rootPath + selected.fileName;
-                self.$hdfsFilesgrid.treegrid('beginEdit', self.hdsfBrowser_lastRow);
+                self.$hdfsFilesgrid.treegrid('beginEdit', self.hdfsBrowser_lastRow);
                 $('span#mkdir_op_span').show();
             });
             $('li#copy_to_li').unbind('click');
@@ -493,6 +526,7 @@ define(function(require, exports, module) {
                                         $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info', function() {
                                             self.$dialog.dialog('close');
                                             self.$hdfsFilesgrid.treegrid('reload');
+                                            self.$hdfsFilesgrid.treegrid('unselectAll');
                                         });
                                     } else {
                                         if( resp.meta.message ) {
@@ -551,6 +585,7 @@ define(function(require, exports, module) {
                                         $.messager.alert('温馨提示', cmOpTypeName + '成功!', 'info', function() {
                                             self.$dialog.dialog('close');
                                             self.$hdfsFilesgrid.treegrid('reload');
+                                            self.$hdfsFilesgrid.treegrid('unselectAll');
                                         });
                                     } else {
                                         if( resp.meta.message ) {
@@ -627,7 +662,7 @@ define(function(require, exports, module) {
 
             self.fileSolveType = fileSolveType;
             $dialog.dialog({
-                title: title ? title : '选择待上传的文件',
+                title: title ? title : '上传文件',
                 href: chooseFileOrEnterPathUrl,
                 width: '410px',
                 height: height ? height : '200px',
@@ -1211,6 +1246,7 @@ define(function(require, exports, module) {
             self.$toolbar.find('a#refresh_a').unbind('click');
             self.$toolbar.find('a#refresh_a').bind('click', function() {
                 self.$monitorgrid.datagrid('reload');//手动刷新
+                self.$monitorgrid.treegrid('unselectAll');
             });
 
             self.$toolbar.find('#search_cont').searchbox({
@@ -1221,7 +1257,8 @@ define(function(require, exports, module) {
         },
         startMonitorInteval: function() {
             return setInterval(function() {
-                    self.$monitorgrid.datagrid('reload');//重新获取监控数据
+                self.$monitorgrid.datagrid('reload');//重新获取监控数据
+                self.$monitorgrid.treegrid('unselectAll');
             }, 500);
         },
         /**
@@ -1261,15 +1298,17 @@ define(function(require, exports, module) {
                             }
                             if( monitorData.finished== 'true' ) {
                                 clearInterval(monitorOneInterval);
-                                $.messager.alert('温馨提示', 'MapReduce任务完成!', 'info');
-                                $('#dialog_win').dialog('close');
+                                $.messager.alert('温馨提示', 'MapReduce任务完成!', 'info', function() {
+                                    $('#dialog_win').dialog('close');
+                                });
                                 //$('#dialog_win2').dialog('close');
                             } else if( monitorData.finished == 'false'){
 
                             } else {
                                 clearInterval(monitorOneInterval);
-                                $.messager.alert('温馨提示', 'MapReduce任务出错!', 'info');
-                                $('#dialog_win2').dialog('close');
+                                $.messager.alert('温馨提示', 'MapReduce任务出错!', 'info', function() {
+                                    $('#dialog_win2').dialog('close');
+                                });
                             }
                         }
                     }
@@ -1290,6 +1329,7 @@ define(function(require, exports, module) {
 
             //self.$hdfsDirgrid = self.$hdfsDirgrid ? self.$hdfsDirgrid : $('#hdfs_dirs_grid');
             self.$hdfsDirgrid.treegrid('reload');
+            self.$hdfsDirgrid.treegrid('unselectAll');
         },
 
         browserHDFSFilesOrDirs: function() {
@@ -1351,6 +1391,8 @@ define(function(require, exports, module) {
                                 return;
                             }
                         }
+                        $(this).treegrid('unselectAll');
+                        $(this).treegrid('selectRow', self.hdfsBrowser_lastRow);
                         var path = self.getCurrSelectedFilePathInHDFS();
                         //console.log('path:');
                         //console.log(path);
@@ -1378,10 +1420,12 @@ define(function(require, exports, module) {
                             data: params,
                             dataType: 'json',
                             success: function(resp) {
+                                self.hdfsBrowser_lastRow = undefined;
                                 if( resp.meta.success ) {
                                     row.hasSave = true;
                                     self.$hdfsDirgrid.treegrid('acceptChanges');
                                     self.$hdfsDirgrid.treegrid('reload');
+                                    self.$hdfsDirgrid.treegrid('unselectAll');
                                 } else {
                                     self.$hdfsDirgrid.treegrid('rejectChanges');
                                     if( self.mkdir ) {
@@ -1477,15 +1521,15 @@ define(function(require, exports, module) {
                     parentId: parentId,
                     iconCls: 'icon-tree-folder',
                 };
+                $currGrid.treegrid('expand', parentId);//展开节点
                 $currGrid.treegrid('append', {
                     parent: parentId,
                     data: [newDirNode]
                 });
-                $currGrid.treegrid('expand', parentId);//展开节点
                 $currGrid.treegrid('endEdit', self.lastRowId);
                 self.lastRowId = newDirNode.fileId;
                 if( $grid ) {
-                    self.hdsfBrowser_lastRow = newDirNode.fileId;
+                    self.hdfsBrowser_lastRow = newDirNode.fileId;
                 }
                 self.mkdir = true;
                 $('#new_dir_tools').show();
@@ -1513,7 +1557,11 @@ define(function(require, exports, module) {
 
             var $currGrid = !$grid ? self.$hdfsDirgrid : $grid;
             var selected = $currGrid.treegrid('getSelected');
-            return self.getFullPathInHDFS(selected, $grid);
+            if(selected) {
+                return self.getFullPathInHDFS(selected, $grid);
+            } else {
+                return '/';
+            }
         },
         /**
          * 递归获取选中文件（文件夹）hdfs中的全路径

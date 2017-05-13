@@ -300,7 +300,7 @@
                     <a id="reload_files_a" class="easyui-linkbutton" iconCls="icon-reload" style="width:60px;margin-left:10px;">刷新</a>
                     <span id="mkdir_op_span" style="display:none;margin-left:50px;">
                         <a id="save_a" class="easyui-linkbutton" iconCls="icon-save">保存</a>
-                        <a id="cancel_a" class="easyui-linkbutton" iconCls="icon-cancel">取消</a>
+                        <a id="cancel_a" class="easyui-linkbutton" iconCls="icon-undo">撤销</a>
                     </span>
                 </td>
                 <td style="text-align:right;padding-right:2px">

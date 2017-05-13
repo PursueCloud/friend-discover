@@ -182,7 +182,6 @@
             }
 
         });
-
         $("#login").click(function(){
             var $pwd=$("input[name=password]");
             $pwd.val($.sha256($pwd.val()));     
@@ -203,9 +202,7 @@
                 $("#login").click();
             }
         });
-        
     });
-
 </script>
     
 </body>
